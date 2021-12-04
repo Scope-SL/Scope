@@ -1,13 +1,20 @@
-﻿using Newtonsoft.Json;
-using Org.BouncyCastle.Utilities.Encoders;
-using Scope.Client.API.Enums;
-using Scope.Client.API.Extensions;
-using Scope.Client.Events.EventArgs;
-using System;
-using System.Text;
+﻿// -----------------------------------------------------------------------
+// <copyright file="TransmissionNetworkObject.cs" company="Scope SL">
+// Copyright (c) Scope SL. All rights reserved.
+// Licensed under the CC BY-SA 3.0 license.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace Scope.Client.API.Features
 {
+    using System;
+    using System.Text;
+    using Newtonsoft.Json;
+    using Org.BouncyCastle.Utilities.Encoders;
+    using Scope.Client.API.Enums;
+    using Scope.Client.API.Extensions;
+    using Scope.Client.Events.EventArgs;
+
     /// <summary>
     /// A tool to manage packets.
     /// </summary>
@@ -16,13 +23,15 @@ namespace Scope.Client.API.Features
         /// <summary>
         /// Initializes a new instance of the <see cref="TransmissionNetworkObject"/> class.
         /// </summary>
-        public TransmissionNetworkObject() { }
+        public TransmissionNetworkObject()
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TransmissionNetworkObject"/> class.
         /// </summary>
-        /// <param name="id">The packet <see cref="uint">id</see></param>
-        /// <param name="data">The packet <see cref="byte">data</see></param>
+        /// <param name="id">The packet <see cref="uint">id</see>.</param>
+        /// <param name="data">The packet <see cref="byte">data</see>.</param>
         public TransmissionNetworkObject(uint id, byte[] data)
         {
             Id = id;
@@ -32,23 +41,24 @@ namespace Scope.Client.API.Features
         /// <summary>
         /// Initializes a new instance of the <see cref="TransmissionNetworkObject"/> class.
         /// </summary>
-        /// <param name="id">The packet <see cref="uint">id</see></param>
-        /// <param name="data">The packet <see cref="byte">data</see></param>
+        /// <param name="id">The packet <see cref="uint">id</see>.</param>
+        /// <param name="data">The packet <see cref="byte">data</see>.</param>
         /// <param name="transmissionEminence">The stream state.</param>
-        public TransmissionNetworkObject(uint id, byte[] data, byte transmissionEminence) : this(id, data) => TrasmissionEminence = transmissionEminence;
+        public TransmissionNetworkObject(uint id, byte[] data, byte transmissionEminence)
+            : this(id, data) => TrasmissionEminence = transmissionEminence;
 
         /// <summary>
-        /// The TransmissionNetworkObject's packet id.
+        /// Gets or sets the TransmissionNetworkObject's packet id.
         /// </summary>
         public uint Id { get; set; }
 
         /// <summary>
-        /// The TransmissionNetworkObject's packet data.
+        /// Gets or sets TransmissionNetworkObject's packet data.
         /// </summary>
         public byte[] Data { get; set; }
 
         /// <summary>
-        /// Gets the <see cref="string"/> value of <see cref="Data"/>
+        /// Gets the <see cref="string"/> value of <see cref="Data"/>.
         /// </summary>
         public string Source => Encoding.UTF8.GetString(Data);
 
@@ -72,16 +82,16 @@ namespace Scope.Client.API.Features
         /// </summary>
         /// <param name="id">The specified <see cref="uint"/> id.</param>
         /// <param name="data">The <see cref="byte"/>[] data.</param>
-        /// <returns>A new <see cref="TransmissionNetworkObject"/></returns>
-        public static TransmissionNetworkObject GetSource(uint id, byte[] data) => new TransmissionNetworkObject(id, data);
+        /// <returns>A new <see cref="TransmissionNetworkObject"/>.</returns>
+        public static TransmissionNetworkObject GetSource(uint id, byte[] data) => new(id, data);
 
         /// <summary>
         /// Gets the <see cref="TransmissionNetworkObject"/> from the provided <see cref="string"/> data.
         /// </summary>
         /// <param name="id">The specified <see cref="uint"/> id.</param>
         /// <param name="data">The <see cref="string"/> data.</param>
-        /// <returns>A new <see cref="TransmissionNetworkObject"/></returns>
-        public static TransmissionNetworkObject GetSource(uint id, string data) => new TransmissionNetworkObject(id, Encoding.UTF8.GetBytes(data));
+        /// <returns>A new <see cref="TransmissionNetworkObject"/>.</returns>
+        public static TransmissionNetworkObject GetSource(uint id, string data) => new(id, Encoding.UTF8.GetBytes(data));
 
         /// <summary>
         /// Gets the <see cref="TransmissionNetworkObject"/> from the provided deserialized <see cref="{T}"/> source.
@@ -89,7 +99,7 @@ namespace Scope.Client.API.Features
         /// <typeparam name="T">The <see cref="{T}"/> source type.</typeparam>
         /// <param name="id">The specified <see cref="uint"/> id.</param>
         /// <param name="data">The <see cref="{T}"/> source.</param>
-        /// <returns>A new <see cref="TransmissionNetworkObject"/></returns>
+        /// <returns>A new <see cref="TransmissionNetworkObject"/>.</returns>
         public static TransmissionNetworkObject GetDeserializedSource<T>(uint id, T data) => GetSource(id, JsonConvert.SerializeObject(data));
 
         /// <summary>
@@ -106,7 +116,7 @@ namespace Scope.Client.API.Features
         /// <summary>
         /// Gets a value which determines if the <see cref="byte"/>[] source meets the standard data requirements.
         /// </summary>
-        /// <param name="managedBuffer"></param>
+        /// <param name="managedBuffer">The <see cref="byte"/>[] buffer value.</param>
         /// <returns><see langword="true"/> if the <see cref="byte"/>[] source meets the standard data requirements; otherwise, <see langword="false"/>.</returns>
         public static bool GetDataEminenceFromEncodedObject(byte[] managedBuffer) => managedBuffer[0] == byte.MinValue && managedBuffer[1] == byte.MaxValue;
 
@@ -123,8 +133,10 @@ namespace Scope.Client.API.Features
             managedBuffer[1] = byte.MaxValue;
             managedBuffer[6] = target.TrasmissionEminence;
             id = BitConverter.GetBytes(target.Id);
-            for (int i = 2; i < 6; i++) managedBuffer[i] = id[i - 2];
-            for (int i = 0; i < target.Data.Length; i++) managedBuffer[i + 7] = target.Data[i];
+            for (int i = 2; i < 6; i++)
+                managedBuffer[i] = id[i - 2];
+            for (int i = 0; i < target.Data.Length; i++)
+                managedBuffer[i + 7] = target.Data[i];
         }
 
         /// <summary>
@@ -134,9 +146,11 @@ namespace Scope.Client.API.Features
         /// <returns>A decoded <see cref="TransmissionNetworkObject"/>; otherwise, <see langword="null"/> if the provided source is not data.</returns>
         public static TransmissionNetworkObject DecodeTransmissionNetworkObject(byte[] source)
         {
-            if (!source.IsData()) return null;
+            if (!source.IsData())
+                return null;
             byte[] managedBuffer = new byte[source.Length - 7];
-            for (int i = 0; i < managedBuffer.Length; i++) managedBuffer[i] = source[i + 7];
+            for (int i = 0; i < managedBuffer.Length; i++)
+                managedBuffer[i] = source[i + 7];
             return new TransmissionNetworkObject(BitConverter.ToUInt32(source, 2), managedBuffer, source[6]);
         }
 
@@ -146,8 +160,9 @@ namespace Scope.Client.API.Features
         /// <param name="data">The <see cref="TransmissionNetworkObject"/> to receive.</param>
         public static void ReceiveData(TransmissionNetworkObject data)
         {
-            ReceivingDataEventArgs ev = new ReceivingDataEventArgs(data);
-            if (!ev.IsAllowed) return;
+            ReceivingDataEventArgs ev = new(data);
+            if (!ev.IsAllowed)
+                return;
             Log.Info($"TransmissionNetworkResponse: {data}");
         }
 
@@ -159,6 +174,7 @@ namespace Scope.Client.API.Features
         {
             byte[] encoded = GetEncodedObject(data);
             Log.Info($"TransmissionNetworkRequest: {data.ReadableEncodedSource}");
+
             // CmdCommandToServer
         }
     }

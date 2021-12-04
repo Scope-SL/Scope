@@ -41,6 +41,7 @@ namespace UnityEngine
                 IntPtr ptr = get_assetDelegateField(this.Pointer);
                 if (ptr == IntPtr.Zero)
                     return null;
+
                 return new Object(ptr);
             }
         }
@@ -52,6 +53,7 @@ namespace UnityEngine
                 IntPtr ptr = get_allAssetsDelegateField(this.Pointer);
                 if (ptr == IntPtr.Zero)
                     return null;
+
                 return new Il2CppReferenceArray<Object>(ptr);
             }
         }

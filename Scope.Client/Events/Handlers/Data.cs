@@ -36,6 +36,6 @@ namespace Scope.Client.Events.Handlers
         /// Called before sending data.
         /// </summary>
         /// <param name="ev">The <see cref="SendingDataEventArgs"/> event.</param>
-        public static void OnReceivingData(SendingDataEventArgs ev) => SendingData.InvokeSafely(ev);
+        public static void OnSendingData(SendingDataEventArgs ev) => SendingData.InvokeSafely(ev);
     }
 }

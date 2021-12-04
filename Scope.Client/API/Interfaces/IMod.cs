@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="IMod{TConfig}.cs" company="Scope SL">
+// <copyright file="IMod.cs" company="Scope SL">
 // Copyright (c) Scope SL. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>

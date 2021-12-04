@@ -38,6 +38,12 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\References\Refs\unhollowed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\References\Refs\unhollowed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -51,10 +57,18 @@
     <Compile Include="API\Enums\TransmissionNetworkObjectType.cs" />
     <Compile Include="API\Extensions\DataExtensions.cs" />
     <Compile Include="API\Extensions\StringExtensions.cs" />
+    <Compile Include="API\Features\Packets\ClientPlaySound.cs" />
+    <Compile Include="API\Features\Packets\ClientRedirect.cs" />
+    <Compile Include="API\Features\Packets\ObjectDestroy.cs" />
+    <Compile Include="API\Features\Packets\ObjectSpawn.cs" />
+    <Compile Include="API\Features\Packets\ObjectLocation.cs" />
+    <Compile Include="API\Features\Packets\RoundStart.cs" />
+    <Compile Include="API\Features\Packets\ConnectionSuccessful.cs" />
+    <Compile Include="API\Interfaces\IMod.cs" />
+    <Compile Include="Events\Patches\TransmissionNetwork.cs" />
     <Compile Include="Loader\Config.cs" />
     <Compile Include="API\Features\Log.cs" />
     <Compile Include="API\Features\TransmissionNetworkObject.cs" />
-    <Compile Include="API\Interfaces\IMod{TConfig}.cs" />
     <Compile Include="Events\Extensions\Event.cs" />
     <Compile Include="Events\EventArgs\SendingDataEventArgs.cs" />
     <Compile Include="Events\EventArgs\ReceivingDataEventArgs.cs" />
@@ -67,6 +81,8 @@
     <Compile Include="ClientComponent.cs" />
     <Compile Include="API\Features\Mod.cs" />
     <Compile Include="API\Interfaces\IConfig.cs" />
+    <Compile Include="Loader\UnhollowerSupport\Support\Coroutines.cs" />
+    <Compile Include="Loader\UnhollowerSupport\UnhollowerSupport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -418,5 +434,6 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -15,7 +15,6 @@ namespace Scope.Client.API.Features
     using Scope.Client.API.Extensions;
     using Scope.Client.Events.EventArgs;
     using Scope.Client.Events.Patches;
-    using Scope.Client.Events.Patches.TransmissionNetwork;
 
     /// <summary>
     /// A tool to manage packets.
@@ -182,7 +181,7 @@ namespace Scope.Client.API.Features
             byte[] encoded = GetEncodedObject(data);
             Log.Info($"TransmissionNetworkRequest: {data.ReadableEncodedSource}");
 
-            TransmissionStartPatch.Transmission.CmdCommandToServer(encoded, false);
+            TransmissionNetwork.Transmission.CmdCommandToServer(encoded, false);
         }
 
         /// <summary>

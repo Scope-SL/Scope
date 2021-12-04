@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Scope.Installer</name>
+    </assembly>
+    <members>
+        <member name="T:Scope.Installer.Installer">
+            <summary>
+            The installer tool.
+            </summary>
+        </member>
+        <member name="M:Scope.Installer.Installer.Main(System.String[])">
+            <summary>
+            This method is the entrypoint of the program.
+            </summary>
+            <param name="args"><see cref="T:System.String"/>[] args.</param>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,12 @@
+﻿
+
+[*.cs]
+
+# SA0001: XML comment analysis disabled
+dotnet_diagnostic.SA0001.severity = none
+
+# CS1658: Warning is overriding an error
+dotnet_diagnostic.CS1658.severity = silent
+
+# CS1584: XML comment has syntactically incorrect cref attribute
+dotnet_diagnostic.CS1584.severity = silent

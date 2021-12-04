@@ -48,7 +48,7 @@ namespace Scope.Client.API.Enums
         ClientPlaySound = 0x15,
 
         /// <summary>
-        /// Round packes.
+        /// Round packets.
         /// </summary>
         RoundStart = 0x1E,
     }

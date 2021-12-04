@@ -14,6 +14,7 @@ namespace Scope.Client.API.Features
     using Scope.Client.API.Enums;
     using Scope.Client.API.Extensions;
     using Scope.Client.Events.EventArgs;
+    using Scope.Client.Events.Patches;
 
     /// <summary>
     /// A tool to manage packets.
@@ -30,9 +31,9 @@ namespace Scope.Client.API.Features
         /// <summary>
         /// Initializes a new instance of the <see cref="TransmissionNetworkObject"/> class.
         /// </summary>
-        /// <param name="id">The packet <see cref="uint">id</see>.</param>
+        /// <param name="id">The packet <see cref="ushort">id</see>.</param>
         /// <param name="data">The packet <see cref="byte">data</see>.</param>
-        public TransmissionNetworkObject(uint id, byte[] data)
+        public TransmissionNetworkObject(ushort id, byte[] data)
         {
             Id = id;
             Data = data;
@@ -41,16 +42,20 @@ namespace Scope.Client.API.Features
         /// <summary>
         /// Initializes a new instance of the <see cref="TransmissionNetworkObject"/> class.
         /// </summary>
-        /// <param name="id">The packet <see cref="uint">id</see>.</param>
+        /// <param name="id">The packet <see cref="ushort">id</see>.</param>
         /// <param name="data">The packet <see cref="byte">data</see>.</param>
         /// <param name="transmissionEminence">The stream state.</param>
-        public TransmissionNetworkObject(uint id, byte[] data, byte transmissionEminence)
+        public TransmissionNetworkObject(ushort id, byte[] data, byte transmissionEminence)
             : this(id, data) => TrasmissionEminence = transmissionEminence;
 
         /// <summary>
         /// Gets or sets the TransmissionNetworkObject's packet id.
         /// </summary>
-        public uint Id { get; set; }
+        public ushort Id
+        {
+            get => (ushort)Type;
+            set => Type = (TransmissionNetworkObjectType)value;
+        }
 
         /// <summary>
         /// Gets or sets TransmissionNetworkObject's packet data.
@@ -80,27 +85,27 @@ namespace Scope.Client.API.Features
         /// <summary>
         /// Gets the <see cref="TransmissionNetworkObject"/> from the provided <see cref="byte"/>[] data.
         /// </summary>
-        /// <param name="id">The specified <see cref="uint"/> id.</param>
+        /// <param name="id">The specified <see cref="ushort"/> id.</param>
         /// <param name="data">The <see cref="byte"/>[] data.</param>
         /// <returns>A new <see cref="TransmissionNetworkObject"/>.</returns>
-        public static TransmissionNetworkObject GetSource(uint id, byte[] data) => new(id, data);
+        public static TransmissionNetworkObject GetSource(ushort id, byte[] data) => new(id, data);
 
         /// <summary>
         /// Gets the <see cref="TransmissionNetworkObject"/> from the provided <see cref="string"/> data.
         /// </summary>
-        /// <param name="id">The specified <see cref="uint"/> id.</param>
+        /// <param name="id">The specified <see cref="ushort"/> id.</param>
         /// <param name="data">The <see cref="string"/> data.</param>
         /// <returns>A new <see cref="TransmissionNetworkObject"/>.</returns>
-        public static TransmissionNetworkObject GetSource(uint id, string data) => new(id, Encoding.UTF8.GetBytes(data));
+        public static TransmissionNetworkObject GetSource(ushort id, string data) => new(id, Encoding.UTF8.GetBytes(data));
 
         /// <summary>
         /// Gets the <see cref="TransmissionNetworkObject"/> from the provided deserialized <see cref="{T}"/> source.
         /// </summary>
         /// <typeparam name="T">The <see cref="{T}"/> source type.</typeparam>
-        /// <param name="id">The specified <see cref="uint"/> id.</param>
+        /// <param name="id">The specified <see cref="ushort"/> id.</param>
         /// <param name="data">The <see cref="{T}"/> source.</param>
         /// <returns>A new <see cref="TransmissionNetworkObject"/>.</returns>
-        public static TransmissionNetworkObject GetDeserializedSource<T>(uint id, T data) => GetSource(id, JsonConvert.SerializeObject(data));
+        public static TransmissionNetworkObject GetDecodedObject<T>(ushort id, T data) => GetSource(id, JsonConvert.SerializeObject(data));
 
         /// <summary>
         /// Gets the encoded value of the provided <see cref="TransmissionNetworkObject"/>.
@@ -151,20 +156,14 @@ namespace Scope.Client.API.Features
             byte[] managedBuffer = new byte[source.Length - 7];
             for (int i = 0; i < managedBuffer.Length; i++)
                 managedBuffer[i] = source[i + 7];
-            return new TransmissionNetworkObject(BitConverter.ToUInt32(source, 2), managedBuffer, source[6]);
+            return new TransmissionNetworkObject(BitConverter.ToUInt16(source, 2), managedBuffer, source[6]);
         }
 
         /// <summary>
         /// Handles the provided <see cref="TransmissionNetworkObject"/> to receive.
         /// </summary>
         /// <param name="data">The <see cref="TransmissionNetworkObject"/> to receive.</param>
-        public static void ReceiveData(TransmissionNetworkObject data)
-        {
-            ReceivingDataEventArgs ev = new(data);
-            if (!ev.IsAllowed)
-                return;
-            Log.Info($"TransmissionNetworkResponse: {data}");
-        }
+        public static void ReceiveData(TransmissionNetworkObject data) => Log.Info($"TransmissionNetworkResponse: {data}");
 
         /// <summary>
         /// Handles the provided <see cref="TransmissionNetworkObject"/> to send.
@@ -172,10 +171,24 @@ namespace Scope.Client.API.Features
         /// <param name="data">The <see cref="TransmissionNetworkObject"/> to send.</param>
         public static void SendData(TransmissionNetworkObject data)
         {
+            SendingDataEventArgs ev = new(data);
+
+            Events.Handlers.Data.OnSendingData(ev);
+
+            if (!ev.IsAllowed)
+                return;
+
             byte[] encoded = GetEncodedObject(data);
             Log.Info($"TransmissionNetworkRequest: {data.ReadableEncodedSource}");
 
-            // CmdCommandToServer
+            TransmissionNetwork.Transmission.CmdCommandToServer(encoded, false);
         }
+
+        /// <summary>
+        /// Casts the TransmissionNetworkObject to the specified type.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="{T}"/> source type.</typeparam>
+        /// <returns>A new <see cref="{T}"/> object.</returns>
+        public T Cast<T>() => JsonConvert.DeserializeObject<T>(Source);
     }
 }

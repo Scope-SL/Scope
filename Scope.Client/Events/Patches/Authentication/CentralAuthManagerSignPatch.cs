@@ -9,9 +9,9 @@ namespace Scope.Client.Events.Patches.Authentication
 {
 #pragma warning disable SA1600 // Elements should be documented
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+#pragma warning disable IDE0060 // Remove unused parameter
 
     using HarmonyLib;
-    using Scope.Client.API.Features;
 
     /// <summary>
     /// Patches <see cref="CentralAuthManager.Sign"/>.

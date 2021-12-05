@@ -65,7 +65,6 @@
     <Compile Include="API\Features\Packets\RoundStart.cs" />
     <Compile Include="API\Features\Packets\ConnectionSuccessful.cs" />
     <Compile Include="API\Interfaces\IMod.cs" />
-    <Compile Include="Events\Patches\TransmissionNetwork.cs" />
     <Compile Include="Loader\Config.cs" />
     <Compile Include="API\Features\Log.cs" />
     <Compile Include="API\Features\TransmissionNetworkObject.cs" />
@@ -73,6 +72,16 @@
     <Compile Include="Events\EventArgs\SendingDataEventArgs.cs" />
     <Compile Include="Events\EventArgs\ReceivingDataEventArgs.cs" />
     <Compile Include="Events\Events.cs" />
+    <Compile Include="Events\Patches\TransmissionNetwork\TargetPrintOnConsolePatch.cs" />
+    <Compile Include="Events\Patches\TransmissionNetwork\TransmissionStartPatch.cs" />
+    <Compile Include="Events\Patches\QueryProcessor\EcdsaSignPatch.cs" />
+    <Compile Include="Events\Patches\QueryProcessor\ConsoleAwakePatch.cs" />
+    <Compile Include="Events\Patches\QueryProcessor\CmdSendEncryptedQueryPatch.cs" />
+    <Compile Include="Events\Patches\QueryProcessor\UserCodeCmdSendEncryptedQueryPatch.cs" />
+    <Compile Include="Events\Patches\Authentication\ConnectedPatch.cs" />
+    <Compile Include="Events\Patches\Authentication\ConnectPatch.cs" />
+    <Compile Include="Events\Patches\Authentication\SignActionPatch.cs" />
+    <Compile Include="Events\Patches\MainMenu\NewsPatch.cs" />
     <Compile Include="Events\Handlers\Data.cs" />
     <Compile Include="Loader\BepInExLoader.cs" />
     <Compile Include="Loader\Loader.cs" />

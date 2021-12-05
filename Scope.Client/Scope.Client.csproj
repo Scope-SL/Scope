@@ -39,10 +39,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\References\Refs\unhollowed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\References\unhollowed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\References\Refs\unhollowed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\References\unhollowed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -68,6 +68,9 @@
     <Compile Include="Loader\Config.cs" />
     <Compile Include="API\Features\Log.cs" />
     <Compile Include="API\Features\TransmissionNetworkObject.cs" />
+    <Compile Include="AssetBundle\Il2CppAssetBundle.cs" />
+    <Compile Include="AssetBundle\Il2CppAssetBundleCreateRequest.cs" />
+    <Compile Include="AssetBundle\Il2CppAssetBundleRequest.cs" />
     <Compile Include="Events\Extensions\Event.cs" />
     <Compile Include="Events\EventArgs\SendingDataEventArgs.cs" />
     <Compile Include="Events\EventArgs\ReceivingDataEventArgs.cs" />
@@ -80,7 +83,7 @@
     <Compile Include="Events\Patches\QueryProcessor\UserCodeCmdSendEncryptedQueryPatch.cs" />
     <Compile Include="Events\Patches\Authentication\ConnectedPatch.cs" />
     <Compile Include="Events\Patches\Authentication\ConnectPatch.cs" />
-    <Compile Include="Events\Patches\Authentication\SignActionPatch.cs" />
+    <Compile Include="Events\Patches\Authentication\CentralAuthManagerSignPatch.cs" />
     <Compile Include="Events\Patches\MainMenu\NewsPatch.cs" />
     <Compile Include="Events\Handlers\Data.cs" />
     <Compile Include="Loader\BepInExLoader.cs" />

@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="SignActionPatch.cs" company="Scope SL">
+// <copyright file="CentralAuthManagerSignPatch.cs" company="Scope SL">
 // Copyright (c) Scope SL. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
@@ -17,12 +17,12 @@ namespace Scope.Client.Events.Patches.Authentication
     /// Patches <see cref="CentralAuthManager.Sign"/>.
     /// </summary>
     [HarmonyPatch(typeof(CentralAuthManager), nameof(CentralAuthManager.Sign))]
-    internal class SignActionPatch
+    internal class CentralAuthManagerSignPatch
     {
         public static bool Prefix(ref string __result, string ticket)
         {
-            Log.Info($"CentralAuthManager::Sign action: {ticket}");
-            __result = string.Empty;
+            __result = "Client Authenticated";
+            CentralAuthManager.Authenticated = true;
             return false;
         }
     }

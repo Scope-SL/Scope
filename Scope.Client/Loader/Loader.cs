@@ -66,7 +66,7 @@ namespace Scope.Client.Loader
         {
             try
             {
-                return Assembly.UnsafeLoadFrom(path); // Assembly.Load(File.ReadAllBytes(path));
+                return Assembly.UnsafeLoadFrom(path);
             }
             catch (Exception exception)
             {

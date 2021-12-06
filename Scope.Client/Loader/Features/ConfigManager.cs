@@ -31,7 +31,7 @@ namespace Scope.Client.Loader.Features
             {
                 Log.Info("Loading mod configs...");
 
-                Dictionary<string, object> rawDeserializedConfigs = Loader.Deserializer.Deserialize<Dictionary<string, object>>(rawConfigs) ?? new();
+                Dictionary<string, object> rawDeserializedConfigs = ((YamlDotNet.Serialization.IDeserializer)Loader.Deserializer).Deserialize<Dictionary<string, object>>(rawConfigs) ?? new();
                 SortedDictionary<string, IConfig> deserializedConfigs = new(StringComparer.Ordinal);
 
                 if (!rawDeserializedConfigs.TryGetValue("scope_loader", out object rawDeserializedConfig))
@@ -42,7 +42,7 @@ namespace Scope.Client.Loader.Features
                 }
                 else
                 {
-                    deserializedConfigs.Add("scope_loader", Loader.Deserializer.Deserialize<Config>(Loader.Serializer.Serialize(rawDeserializedConfig)));
+                    deserializedConfigs.Add("scope_loader", ((YamlDotNet.Serialization.IDeserializer)Loader.Deserializer).Deserialize<Config>(((YamlDotNet.Serialization.ISerializer)Loader.Serializer).Serialize(rawDeserializedConfig)));
                     Loader.Config.CopyProperties(deserializedConfigs["scope_loader"]);
                 }
 
@@ -57,7 +57,7 @@ namespace Scope.Client.Loader.Features
                     {
                         try
                         {
-                            deserializedConfigs.Add(mod.Prefix, (IConfig)Loader.Deserializer.Deserialize(Loader.Serializer.Serialize(rawDeserializedConfig), mod.Config.GetType()));
+                            deserializedConfigs.Add(mod.Prefix, (IConfig)((YamlDotNet.Serialization.IDeserializer)Loader.Deserializer).Deserialize(((YamlDotNet.Serialization.ISerializer)Loader.Serializer).Serialize(rawDeserializedConfig), mod.Config.GetType()));
                             mod.Config.CopyProperties(deserializedConfigs[mod.Prefix]);
                         }
                         catch (YamlException yamlException)
@@ -117,7 +117,7 @@ namespace Scope.Client.Loader.Features
                 if (configs == null || configs.Count == 0)
                     return false;
 
-                return Save(Loader.Serializer.Serialize(configs));
+                return Save(((YamlDotNet.Serialization.ISerializer)Loader.Serializer).Serialize(configs));
             }
             catch (YamlException yamlException)
             {

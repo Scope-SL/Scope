@@ -16,9 +16,6 @@ namespace Scope.Client.Loader
     using Scope.Client.API.Interfaces;
     using Scope.Client.Loader.Features;
     using Scope.Client.Loader.Features.Configs;
-    using YamlDotNet.Serialization;
-    using YamlDotNet.Serialization.NamingConventions;
-    using YamlDotNet.Serialization.NodeDeserializers;
 
     /// <summary>
     /// Used to handle mods.
@@ -53,22 +50,12 @@ namespace Scope.Client.Loader
         /// <summary>
         /// Gets the serializer for configs.
         /// </summary>
-        public static ISerializer Serializer { get; } = new SerializerBuilder()
-            .WithTypeInspector(inner => new CommentGatheringTypeInspector(inner))
-            .WithEmissionPhaseObjectGraphVisitor(args => new CommentsObjectGraphVisitor(args.InnerVisitor))
-            .WithNamingConvention(UnderscoredNamingConvention.Instance)
-            .IgnoreFields()
-            .Build();
+        public static object Serializer { get; private set; }
 
         /// <summary>
         /// Gets the deserializer for configs.
         /// </summary>
-        public static IDeserializer Deserializer { get; } = new DeserializerBuilder()
-            .WithNamingConvention(UnderscoredNamingConvention.Instance)
-            .WithNodeDeserializer(inner => new ConfigsValidator(inner), deserializer => deserializer.InsteadOf<ObjectNodeDeserializer>())
-            .IgnoreFields()
-            .IgnoreUnmatchedProperties()
-            .Build();
+        public static object Deserializer { get; private set; }
 
         /// <summary>
         /// Loads an <see cref="Assembly"/>.
@@ -79,7 +66,7 @@ namespace Scope.Client.Loader
         {
             try
             {
-                return Assembly.Load(File.ReadAllBytes(path));
+                return Assembly.UnsafeLoadFrom(path); // Assembly.Load(File.ReadAllBytes(path));
             }
             catch (Exception exception)
             {
@@ -95,8 +82,9 @@ namespace Scope.Client.Loader
         /// <param name="deps">The dependencies loaded by Scope.</param>
         public static void LoadAll(Assembly[] deps = null)
         {
-            Log.Message($"{Assembly.GetExecutingAssembly().GetName().Name} - " +
-                $"Version {Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
+            var assemblyName = Assembly.GetExecutingAssembly().GetName();
+            Log.Message($"{assemblyName.Name} - " +
+                $"Version {assemblyName.Version}");
             CustomNetworkManager.Modded = true;
             Paths.Init();
 
@@ -112,8 +100,28 @@ namespace Scope.Client.Loader
         public static void GlobalStartupProcess()
         {
             LoadDependencies();
+            LoadConfigDepen();
             LoadMods();
             EnableMods();
+        }
+
+        /// <summary>
+        ///  Sets the value of <see cref="Deserializer"/> and <see cref="Serializer"/>.
+        /// </summary>
+        public static void LoadConfigDepen()
+        {
+            Deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
+                .WithNamingConvention(YamlDotNet.Serialization.NamingConventions.UnderscoredNamingConvention.Instance)
+                .WithNodeDeserializer(inner => new ConfigsValidator(inner), deserializer => deserializer.InsteadOf<YamlDotNet.Serialization.NodeDeserializers.ObjectNodeDeserializer>())
+                .IgnoreFields()
+                .IgnoreUnmatchedProperties()
+                .Build();
+            Serializer = new YamlDotNet.Serialization.SerializerBuilder()
+                .WithTypeInspector(inner => new CommentGatheringTypeInspector(inner))
+                .WithEmissionPhaseObjectGraphVisitor(args => new CommentsObjectGraphVisitor(args.InnerVisitor))
+                .WithNamingConvention(YamlDotNet.Serialization.NamingConventions.UnderscoredNamingConvention.Instance)
+                .IgnoreFields()
+                .Build();
         }
 
         /// <summary>
@@ -121,9 +129,6 @@ namespace Scope.Client.Loader
         /// </summary>
         public static void LoadMods()
         {
-            foreach (string file in Directory.GetFiles(Paths.Dependencies, "*.dll"))
-                Assembly.UnsafeLoadFrom(file);
-
             foreach (Type type in from string file in Directory.GetFiles(Paths.Mods, "*.dll")
                                   let assembly = Assembly.UnsafeLoadFrom(file)
                                   from Type type in assembly.GetTypes()

@@ -8,7 +8,6 @@
 namespace Scope.Client.Loader
 {
     using System.IO;
-    using Il2CppSystem.Reflection;
 
     /// <summary>
     /// A tool to easily manage and interact with paths.
@@ -30,8 +29,12 @@ namespace Scope.Client.Loader
         /// </summary>
         internal static void LoadPaths()
         {
-            ModsDirectory = Assembly.GetCallingAssembly().Location + "\\..\\..\\..\\Mods";
+            ModsDirectory = Path.Combine("ScopeClient", "Mods");
+            if (!Directory.Exists(ModsDirectory))
+                Directory.CreateDirectory(ModsDirectory);
             ModsDependenciesDirectory = Path.Combine(ModsDirectory, "dependencies");
+            if (!Directory.Exists(ModsDependenciesDirectory))
+                Directory.CreateDirectory(ModsDependenciesDirectory);
         }
     }
 }

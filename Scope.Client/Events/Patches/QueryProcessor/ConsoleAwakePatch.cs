@@ -18,6 +18,10 @@ namespace Scope.Client.Events.Patches.QueryProcessor
     [HarmonyPatch(typeof(GameCore.Console), nameof(GameCore.Console.Awake))]
     internal class ConsoleAwakePatch
     {
-        public static void Prefix() => Log.Info("Loading GameConsole");
+        public static void Prefix(GameCore.Console __instance)
+        {
+            Log.Info("Loading GameConsole");
+            ClientComponent.CreateInstance(__instance.gameObject);
+        }
     }
 }

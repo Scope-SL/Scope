@@ -10,7 +10,7 @@ namespace Scope.Client.Loader
     using BepInEx;
     using BepInEx.IL2CPP;
     using HarmonyLib;
-    using Scope.Client.Loader;
+    using UnhollowerRuntimeLib;
 
     /// <summary>
     /// Used to load the BepInEx.
@@ -19,8 +19,6 @@ namespace Scope.Client.Loader
     [BepInProcess("SCPSL.exe")]
     public class BepInExLoader : BasePlugin
     {
-        private Client _client;
-
         /// <summary>
         /// Gets the <see cref="Harmony"/> instance.
         /// </summary>
@@ -34,18 +32,19 @@ namespace Scope.Client.Loader
         /// <summary>
         /// Gets the <see cref="Client"></see>.
         /// </summary>
-        public Client Client => _client ?? (_client = new Client());
+        public static Client Client;
 
         /// <inheritdoc/>
         public override void Load()
         {
+            Client = new Client();
             Instance = this;
+            ClassInjector.RegisterTypeInIl2Cpp<ClientComponent>();
             Harmony = new Harmony("scopeclient.client.github");
-
+            Harmony.PatchAll();
             Paths.LoadPaths();
             Loader.LoadAll();
             Client.OnApplicationStart();
-            ClientComponent.CreateInstance(Client, Instance);
         }
     }
 }

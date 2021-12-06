@@ -8,8 +8,6 @@
 namespace Scope.Client
 {
     using System;
-    using Scope.Client.API;
-    using Scope.Client.API.Interfaces;
     using Scope.Client.Loader;
     using UnityEngine;
 
@@ -32,41 +30,28 @@ namespace Scope.Client
         /// <summary>
         /// Creates a new <see cref="ClientComponent">instance</see>.
         /// </summary>
-        /// <param name="client">The <see cref="Client"/> value.</param>
-        /// <param name="loader">The <see cref="BepInExLoader"/> value.</param>
-        public static void CreateInstance(Client client, BepInExLoader loader)
+        /// <param name="gameObject">The <see cref="GameObject"/> value.</param>
+        public static void CreateInstance(GameObject gameObject)
         {
-            ClientComponent obj = new GameObject().AddComponent<ClientComponent>();
+            ClientComponent obj = gameObject.AddComponent<ClientComponent>();
             DontDestroyOnLoad(obj.gameObject);
             obj.hideFlags |= HideFlags.HideAndDontSave;
-            obj._client = client;
+            obj._client = BepInExLoader.Client;
         }
 
         private void Update()
         {
             _client?.OnUpdate();
-            foreach (IMod<IConfig> mod in Loader.Loader.Mods)
-            {
-                mod.OnUpdate();
-            }
         }
 
         private void OnGUI()
         {
-            _client.OnGUI();
-            foreach (IMod<IConfig> mod in Loader.Loader.Mods)
-            {
-                mod.OnGUI();
-            }
+            _client?.OnGUI();
         }
 
         private void OnApplicationQuit()
         {
-            _client.OnApplicationQuit();
-            foreach (IMod<IConfig> mod in Loader.Loader.Mods)
-            {
-                mod.OnDisabled();
-            }
+            _client?.OnApplicationQuit();
         }
     }
 }

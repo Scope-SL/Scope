@@ -8,6 +8,7 @@
 namespace Scope.Client
 {
     using System;
+    using Scope.Client.API.Features;
     using Scope.Client.Loader;
     using UnityEngine;
 
@@ -16,7 +17,7 @@ namespace Scope.Client
     /// </summary>
     public class ClientComponent : MonoBehaviour
     {
-        private API.Features.Client _client;
+        private Client _client;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientComponent"/> class.

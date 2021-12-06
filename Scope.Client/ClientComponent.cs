@@ -16,7 +16,7 @@ namespace Scope.Client
     /// </summary>
     public class ClientComponent : MonoBehaviour
     {
-        private Client _client;
+        private API.Features.Client _client;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientComponent"/> class.
@@ -36,7 +36,7 @@ namespace Scope.Client
             ClientComponent obj = gameObject.AddComponent<ClientComponent>();
             DontDestroyOnLoad(obj.gameObject);
             obj.hideFlags |= HideFlags.HideAndDontSave;
-            obj._client = BepInExLoader.Client;
+            obj._client = BepInExLoader.Instance.Client;
         }
 
         private void Update()

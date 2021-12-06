@@ -9,6 +9,7 @@ namespace Scope.Client.API.Features
 {
     using System;
     using System.Reflection;
+    using Scope.Client.API.Enums;
     using Scope.Client.API.Extensions;
     using Scope.Client.API.Interfaces;
 
@@ -50,6 +51,12 @@ namespace Scope.Client.API.Features
         public virtual Version Version { get; }
 
         /// <inheritdoc/>
+        public ExecutionPriority Priority { get; }
+
+        /// <inheritdoc/>
+        public Version RequiredScopeVersion { get; }
+
+        /// <inheritdoc/>
         public virtual void OnEnabled()
         {
         }
@@ -67,6 +74,12 @@ namespace Scope.Client.API.Features
         /// <inheritdoc/>
         public virtual void OnDisabled()
         {
+        }
+
+        /// <inheritdoc/>
+        public int CompareTo(IMod<IConfig> other)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -8,7 +8,7 @@
 namespace Scope.Client
 {
     using System;
-    using Scope.Client.API;
+    using Scope.Client.API.Features;
     using Scope.Client.API.Interfaces;
     using Scope.Client.Loader;
     using UnityEngine;
@@ -46,27 +46,21 @@ namespace Scope.Client
         {
             _client?.OnUpdate();
             foreach (IMod<IConfig> mod in Loader.Loader.Mods)
-            {
                 mod.OnUpdate();
-            }
         }
 
         private void OnGUI()
         {
             _client.OnGUI();
             foreach (IMod<IConfig> mod in Loader.Loader.Mods)
-            {
                 mod.OnGUI();
-            }
         }
 
         private void OnApplicationQuit()
         {
             _client.OnApplicationQuit();
             foreach (IMod<IConfig> mod in Loader.Loader.Mods)
-            {
                 mod.OnDisabled();
-            }
         }
     }
 }

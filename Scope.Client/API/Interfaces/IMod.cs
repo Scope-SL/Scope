@@ -9,12 +9,13 @@ namespace Scope.Client.API.Interfaces
 {
     using System;
     using System.Reflection;
+    using Scope.Client.API.Enums;
 
     /// <summary>
     /// Defines the contract for basic mod features.
     /// </summary>
     /// <typeparam name="TConfig">The config type.</typeparam>
-    public interface IMod<out TConfig>
+    public interface IMod<out TConfig> : IComparable<IMod<IConfig>>
         where TConfig : IConfig
     {
         /// <summary>
@@ -46,6 +47,16 @@ namespace Scope.Client.API.Interfaces
         /// Gets the mod version.
         /// </summary>
         public Version Version { get; }
+
+        /// <summary>
+        /// Gets the mod execution priority.
+        /// </summary>
+        ExecutionPriority Priority { get; }
+
+        /// <summary>
+        /// Gets the required version of Scope to execute the mod in stable environment.
+        /// </summary>
+        Version RequiredScopeVersion { get; }
 
         /// <summary>
         /// Called after enabling the mod.

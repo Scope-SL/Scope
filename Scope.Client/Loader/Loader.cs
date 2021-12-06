@@ -79,7 +79,7 @@ namespace Scope.Client.Loader
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Mod \"{mod.Name}\" threw an exeption while enabling: {e}");
+                    Log.Error($"Mod \"{mod.Name}\" threw an exception while enabling: {e}");
                 }
             }
 

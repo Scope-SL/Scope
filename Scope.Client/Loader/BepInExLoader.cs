@@ -54,7 +54,6 @@ namespace Scope.Client.Loader
             Harmony = new Harmony("scope.client.github");
             Harmony.PatchAll();
 
-            Paths.Reload();
             Loader.LoadAll();
 
             Client.OnApplicationStart();

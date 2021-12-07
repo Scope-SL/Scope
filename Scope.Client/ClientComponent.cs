@@ -8,6 +8,7 @@
 namespace Scope.Client
 {
     using System;
+    using Scope.Client.API.Features;
     using Scope.Client.Loader;
     using UnityEngine;
 
@@ -36,7 +37,7 @@ namespace Scope.Client
             ClientComponent obj = gameObject.AddComponent<ClientComponent>();
             DontDestroyOnLoad(obj.gameObject);
             obj.hideFlags |= HideFlags.HideAndDontSave;
-            obj._client = BepInExLoader.Client;
+            obj._client = BepInExLoader.Instance.Client;
         }
 
         private void Update()

@@ -7,9 +7,7 @@
 
 namespace Scope.Client.Loader
 {
-    using System;
     using System.IO;
-    using Il2CppSystem.Reflection;
 
     /// <summary>
     /// A tool to easily manage and interact with paths.
@@ -52,7 +50,7 @@ namespace Scope.Client.Loader
         /// <param name="rootDirectory">The new root directory name.</param>
         internal static void Reload(string rootDirectory = "Scope")
         {
-            Scope = Path.Combine(SCPSL, rootDirectory);
+            Scope = Path.GetFullPath(rootDirectory);
             Mods = Path.Combine(Scope, "Mods");
             Dependencies = Path.Combine(Mods, "Dependencies");
             Configs = Path.Combine(Scope, "Configs");

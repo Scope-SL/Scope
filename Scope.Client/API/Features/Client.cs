@@ -45,7 +45,7 @@ namespace Scope.Client.API.Features
         public Scene CurrentScene => SceneManager.GetActiveScene();
 
         /// <summary>
-        /// Gets a value indicating whether or not the client is connected.
+        /// Gets a value indicating whether or not the client is connected to a server.
         /// </summary>
         public bool IsConnected => CurrentScene.name == "Facility";
 

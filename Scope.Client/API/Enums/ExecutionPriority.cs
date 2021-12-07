@@ -12,9 +12,6 @@ namespace Scope.Client.API.Enums
     /// </summary>
     public enum ExecutionPriority
     {
-        /// <inheritdoc cref="Medium"/>
-        Default = Medium,
-
         /// <summary>
         /// Execute the mod last, after other ones.
         /// </summary>

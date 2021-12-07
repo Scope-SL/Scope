@@ -13,7 +13,7 @@ namespace Scope.Client.Loader.Features.Configs
     using YamlDotNet.Serialization;
 
     /// <summary>
-    /// Configs validator.
+    /// Used to validate configs.
     /// </summary>
     public sealed class ConfigsValidator : INodeDeserializer
     {

@@ -16,7 +16,7 @@ namespace Scope.Client.Events.Patches.Authentication
     /// <summary>
     /// Patches <see cref="NetworkClient.Connect"/>.
     /// </summary>
-    [HarmonyPatch(typeof(NetworkClient), nameof(NetworkClient.Connect))]
+    [HarmonyPatch(typeof(NetworkClient), nameof(NetworkClient.Connect), typeof(string))]
     internal class ConnectPatch
     {
         private static string _newTargetAddress = string.Empty;

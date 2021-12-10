@@ -7,10 +7,13 @@
 
 namespace Scope.Client.Loader
 {
+    using System.Collections.Generic;
     using BepInEx;
     using BepInEx.IL2CPP;
     using HarmonyLib;
-    using Scope.Client.Loader;
+    using Scope.Client.API.Features;
+    using UnhollowerRuntimeLib;
+    using UnityEngine;
 
     /// <summary>
     /// Used to load the BepInEx.
@@ -19,7 +22,10 @@ namespace Scope.Client.Loader
     [BepInProcess("SCPSL.exe")]
     public class BepInExLoader : BasePlugin
     {
-        private Client _client;
+        /// <summary>
+        /// Gets the <see cref="Dictionary{TKey, TValue}"/> that contains all bundles.
+        /// </summary>
+        public static Dictionary<string, Il2CppAssetBundle> AssetBundles => new();
 
         /// <summary>
         /// Gets the <see cref="Harmony"/> instance.
@@ -34,18 +40,23 @@ namespace Scope.Client.Loader
         /// <summary>
         /// Gets the <see cref="Client"></see>.
         /// </summary>
-        public Client Client => _client ?? (_client = new Client());
+        public Client Client { get; private set; }
 
         /// <inheritdoc/>
         public override void Load()
         {
             Instance = this;
-            Harmony = new Harmony("scopeclient.client.github");
 
-            Paths.LoadPaths();
+            Client = new Client();
+
+            ClassInjector.RegisterTypeInIl2Cpp<ClientComponent>();
+
+            Harmony = new Harmony("scope.client.github");
+            Harmony.PatchAll();
+
             Loader.LoadAll();
+
             Client.OnApplicationStart();
-            ClientComponent.CreateInstance(Client, Instance);
         }
     }
 }

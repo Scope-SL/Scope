@@ -8,11 +8,14 @@
 namespace Scope.Client.Loader
 {
     using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
     using System.Reflection;
-    using Il2CppSystem.Collections.Generic;
-    using Il2CppSystem.IO;
     using Scope.Client.API.Features;
     using Scope.Client.API.Interfaces;
+    using Scope.Client.Loader.Features;
+    using Scope.Client.Loader.Features.Configs;
 
     /// <summary>
     /// Used to handle mods.
@@ -20,43 +23,137 @@ namespace Scope.Client.Loader
     public static class Loader
     {
         /// <summary>
-        /// Gets the mods list.
+        /// Gets a <see cref="List{T}"/> containing the mods.
         /// </summary>
-        public static List<IMod<IConfig>> Mods => new();
+        public static SortedSet<IMod<IConfig>> Mods => new(ExecutionPriorityComparer.Instance);
+
+        /// <summary>
+        /// Gets the <see cref="System.Version"/> of the assembly.
+        /// </summary>
+        public static Version Version => Assembly.GetExecutingAssembly().GetName().Version;
+
+        /// <summary>
+        /// Gets the mod's configs.
+        /// </summary>
+        public static Config Config => new();
+
+        /// <summary>
+        /// Gets a <see cref="Dictionary{TKey, TValue}"/> containing the file paths of assemblies.
+        /// </summary>
+        public static Dictionary<Assembly, string> Locations => new();
+
+        /// <summary>
+        /// Gets a <see cref="List{T}"/> containing all the required modules to load the mod.
+        /// </summary>
+        public static List<Assembly> Dependencies => new();
+
+        /// <summary>
+        /// Gets the serializer for configs.
+        /// </summary>
+        public static object Serializer { get; private set; }
+
+        /// <summary>
+        /// Gets the deserializer for configs.
+        /// </summary>
+        public static object Deserializer { get; private set; }
+
+        /// <summary>
+        /// Loads an <see cref="Assembly"/>.
+        /// </summary>
+        /// <param name="path">The path to load the assembly from.</param>
+        /// <returns>The loaded <see cref="Assembly"/>; otherwise, <see langword="null"/>.</returns>
+        public static Assembly LoadAssemblyFromPath(string path)
+        {
+            try
+            {
+                return Assembly.UnsafeLoadFrom(path);
+            }
+            catch (Exception exception)
+            {
+                Log.Error($"Error while loading an assembly at {path}! {exception}");
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Loads all dependencies, mods, configs and then enables all mods.
+        /// </summary>
+        /// <param name="deps">The dependencies loaded by Scope.</param>
+        public static void LoadAll(Assembly[] deps = null)
+        {
+            var assemblyName = Assembly.GetExecutingAssembly().GetName();
+            Log.Message($"{assemblyName.Name} - " +
+                $"Version {assemblyName.Version}");
+            CustomNetworkManager.Modded = true;
+            Paths.Init();
+
+            if (deps?.Length > 0)
+                Dependencies.AddRange(deps);
+
+            GlobalStartupProcess();
+        }
+
+        /// <summary>
+        /// Loads and enables all mods and their dependencies.
+        /// </summary>
+        public static void GlobalStartupProcess()
+        {
+            LoadDependencies();
+            LoadConfigDepen();
+            LoadMods();
+            EnableMods();
+        }
+
+        /// <summary>
+        ///  Sets the value of <see cref="Deserializer"/> and <see cref="Serializer"/>.
+        /// </summary>
+        public static void LoadConfigDepen()
+        {
+            Deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
+                .WithNamingConvention(YamlDotNet.Serialization.NamingConventions.UnderscoredNamingConvention.Instance)
+                .WithNodeDeserializer(inner => new ConfigsValidator(inner), deserializer => deserializer.InsteadOf<YamlDotNet.Serialization.NodeDeserializers.ObjectNodeDeserializer>())
+                .IgnoreFields()
+                .IgnoreUnmatchedProperties()
+                .Build();
+            Serializer = new YamlDotNet.Serialization.SerializerBuilder()
+                .WithTypeInspector(inner => new CommentGatheringTypeInspector(inner))
+                .WithEmissionPhaseObjectGraphVisitor(args => new CommentsObjectGraphVisitor(args.InnerVisitor))
+                .WithNamingConvention(YamlDotNet.Serialization.NamingConventions.UnderscoredNamingConvention.Instance)
+                .IgnoreFields()
+                .Build();
+        }
 
         /// <summary>
         /// Loads all mods.
         /// </summary>
-        public static void LoadAll()
+        public static void LoadMods()
         {
-            foreach (string file in Directory.GetFiles(Paths.ModsDependenciesDirectory, "*.dll"))
-                Assembly.UnsafeLoadFrom(file);
-
-            foreach (string file in Directory.GetFiles(Paths.ModsDirectory, "*.dll"))
+            foreach (Type type in from string file in Directory.GetFiles(Paths.Mods, "*.dll")
+                                  let assembly = Assembly.UnsafeLoadFrom(file)
+                                  from Type type in assembly.GetTypes()
+                                  select type)
             {
-                Assembly assembly = Assembly.UnsafeLoadFrom(file);
+                if (type.IsAbstract || type.IsInterface || type.BaseType?.GetGenericTypeDefinition() != typeof(Mod<>))
+                    continue;
 
-                foreach (Type type in assembly.GetTypes())
+                IMod<IConfig> mod = null;
+                ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
+
+                if (constructor is null)
                 {
-                    if (type.IsAbstract || type.IsInterface || type.BaseType?.GetGenericTypeDefinition() != typeof(Mod<>))
-                        continue;
-
-                    IMod<IConfig> mod = null;
-
-                    ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
-                    if (constructor != null)
-                        mod = constructor.Invoke(null) as IMod<IConfig>;
-                    else
-                    {
-                        object value = Array.Find(type.GetProperties(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public), property => property.PropertyType == type)?.GetValue(null);
-                        if (value != null)
-                            mod = value as IMod<IConfig>;
-                    }
-
-                    mod?.OnEnabled();
-
-                    Mods.Add(mod);
+                    object value = Array.Find(type.GetProperties(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public), property => property.PropertyType == type)?.GetValue(null);
+                    if (value != null)
+                        mod = value as IMod<IConfig>;
                 }
+                else
+                    mod = constructor.Invoke(null) as IMod<IConfig>;
+
+                if (CheckModVersion(mod))
+                    continue;
+
+                mod?.OnEnabled();
+                Mods.Add(mod);
             }
         }
 
@@ -65,21 +162,21 @@ namespace Scope.Client.Loader
         /// </summary>
         public static void EnableMods()
         {
-            List<IMod<IConfig>> toLoad = Mods;
+            List<IMod<IConfig>> toLoad = Mods.ToList();
 
             foreach (IMod<IConfig> mod in toLoad)
             {
                 try
                 {
-                    if (mod.Name.StartsWith("Scope") && mod.Config.IsEnabled)
-                    {
-                        mod.OnEnabled();
-                        toLoad.Remove(mod);
-                    }
+                    if (!mod.Name.StartsWith("Scope") || !mod.Config.IsEnabled)
+                        continue;
+
+                    mod.OnEnabled();
+                    toLoad.Remove(mod);
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Mod \"{mod.Name}\" thew an exeption while enabling: {e}");
+                    Log.Error($"Mod \"{mod.Name}\" threw an exception while enabling: {e}");
                 }
             }
 
@@ -95,6 +192,63 @@ namespace Scope.Client.Loader
                     Log.Error($"Mod \"{mod.Name}\" threw an exception while enabling: {exception}");
                 }
             }
+        }
+
+        /// <summary>
+        /// Loads all dependencies.
+        /// </summary>
+        public static void LoadDependencies()
+        {
+            try
+            {
+                Log.Info($"Loading dependencies at {Paths.Dependencies}");
+
+                foreach (string dependency in Directory.GetFiles(Paths.Dependencies, "*.dll"))
+                {
+                    Assembly assembly = LoadAssemblyFromPath(dependency);
+
+                    if (assembly == null)
+                        continue;
+
+                    Locations[assembly] = dependency;
+
+                    Dependencies.Add(assembly);
+
+                    Log.Info($"Loaded dependency {assembly.GetName().Name}@{assembly.GetName().Version.ToString(3)}");
+                }
+
+                Log.Info("Dependencies loaded successfully!");
+            }
+            catch (Exception exception)
+            {
+                Log.Error($"An error has occurred while loading dependencies! {exception}");
+            }
+        }
+
+        private static bool CheckModVersion(IMod<IConfig> mod)
+        {
+            Version requiredVersion = mod.RequiredScopeVersion;
+            Version actualVersion = Version;
+
+            if (requiredVersion.Major == actualVersion.Major)
+                return false;
+
+            if (requiredVersion.Major > actualVersion.Major)
+            {
+                Log.Error($"You're running an older version of Scope ({Version.ToString(3)})! {mod.Name} won't be loaded! " +
+                          $"Required version to load it: {mod.RequiredScopeVersion.ToString(3)}");
+
+                return true;
+            }
+            else if (requiredVersion.Major < actualVersion.Major)
+            {
+                Log.Error($"You're running an older version of {mod.Name} ({mod.Version.ToString(3)})! Scope won't load it! " +
+                    $"Required version to load it: {requiredVersion.Major}");
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

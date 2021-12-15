@@ -3,7 +3,7 @@ using LiteDB;
 
 namespace Scope.Server.Database.Collections
 {
-    public class Player
+    public class PlayerCollection
     {
         [BsonCtor]
         public Player(string id, string authentication, string name, string ipAddress, string hwid, DateTime firstJoin, DateTime lastJoin)

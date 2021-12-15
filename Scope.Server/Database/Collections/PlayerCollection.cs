@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using LiteDB;
 
 namespace Scope.Server.Database.Collections

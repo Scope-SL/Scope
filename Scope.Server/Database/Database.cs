@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
 // <copyright file="Database.cs" company="Scope SL">
 // Copyright (c) Scope SL. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
@@ -30,7 +30,7 @@ namespace Scope.Server.Database
         /// <summary>
         /// Gets the folder path.
         /// </summary>
-        internal static string Folder => "Server folder";
+        internal static string Folder => Environment.CurrentDirectory;
 
         /// <summary>
         /// Gets the database path.

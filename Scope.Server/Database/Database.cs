@@ -38,7 +38,7 @@ namespace Scope.Server.Database
         internal static string FullPath => Path.Combine(Folder, "database.db");
 
         /// <summary>
-        /// Method for load server database.
+        /// Opens database.
         /// </summary>
         internal static void OpenDatabase()
         {
@@ -58,12 +58,12 @@ namespace Scope.Server.Database
                 Log.Info("Database loaded");
             } catch (Exception e)
             {
-                Log.Error($"Error when try to load database:\n {e.StackTrace}\n {e.Message}");
+                Log.Error($"Error whilst trying to load the database:\n {e.StackTrace}\n {e.Message}");
             }
         }
 
         /// <summary>
-        /// Method for close server database.
+        /// Closes database.
         /// </summary>
         internal static void CloseDatabase()
         {
@@ -76,7 +76,7 @@ namespace Scope.Server.Database
                 Log.Info("Database closed");
             } catch (Exception e)
             {
-                Log.Error($"Error when try to close database:\n {e.StackTrace}\n {e.Message}");
+                Log.Error($"Error whilst trying to close the database:\n {e.StackTrace}\n {e.Message}");
             }
         }
     }

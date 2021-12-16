@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
 // <copyright file="ClientCollection.cs" company="Scope SL">
 // Copyright (c) Scope SL. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.

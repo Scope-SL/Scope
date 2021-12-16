@@ -23,7 +23,7 @@ namespace Scope.Server.Database
         internal static LiteDatabase LiteDatabase { get; set; }
 
         /// <summary>
-        /// Gets or sets clients collection.
+        /// Gets or sets the clients collection.
         /// </summary>
         internal static ILiteCollection<Collections.ClientCollection> ClientCollection { get; set; }
 

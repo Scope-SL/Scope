@@ -18,13 +18,13 @@ namespace Scope.Server.Database.Collections
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientCollection"/> class.
         /// </summary>
-        /// <param name="rawId">Client's raw id.</param>
-        /// <param name="auth">Client's auth.</param>
-        /// <param name="username">Client's username.</param>
-        /// <param name="ipAddress">Client's IP address.</param>
-        /// <param name="hwid">Client's HWID.</param>
-        /// <param name="firstJoin">Client's first join.</param>
-        /// <param name="lastJoin">Client's last join.</param>
+        /// <param name="rawId">The client's raw id.</param>
+        /// <param name="auth">The client's auth.</param>
+        /// <param name="username">The client's username.</param>
+        /// <param name="ipAddress">The client's IP address.</param>
+        /// <param name="hwid">The client's HWID.</param>
+        /// <param name="firstJoin">The client's first join.</param>
+        /// <param name="lastJoin">The client's last join.</param>
         [BsonCtor]
         internal ClientCollection(string rawId, string auth, string username, string ipAddress, string hwid, DateTime firstJoin, DateTime lastJoin)
         {

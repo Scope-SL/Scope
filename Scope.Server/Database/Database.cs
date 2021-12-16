@@ -38,7 +38,7 @@ namespace Scope.Server.Database
         internal static string FullPath => Path.Combine(Folder, "database.db");
 
         /// <summary>
-        /// Opens database.
+        /// Opens the database.
         /// </summary>
         internal static void OpenDatabase()
         {
@@ -63,7 +63,7 @@ namespace Scope.Server.Database
         }
 
         /// <summary>
-        /// Closes database.
+        /// Closes the database.
         /// </summary>
         internal static void CloseDatabase()
         {

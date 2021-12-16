@@ -11,7 +11,7 @@ namespace Scope.Server.Database.Collections
     using LiteDB;
 
     /// <summary>
-    /// A class which contains client information.
+    /// A tool to handle clients information for database solutions.
     /// </summary>
     internal class ClientCollection
     {

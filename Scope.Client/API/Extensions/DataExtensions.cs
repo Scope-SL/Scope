@@ -25,11 +25,6 @@ namespace Scope.Client.API.Extensions
         /// </summary>
         /// <param name="source">The <see cref="byte"/>[] source to check.</param>
         /// <returns><see langword="true"/> if the provided <see cref="byte"/>[] source is valid data; otherwise, <see langword="false"/>.</returns>
-        public static bool IsData(this IEnumerable<byte> source)
-        {
-            if (source.Count() < 2)
-                return false;
-            return GetDataEminenceFromEncodedObject(source.ToArray());
-        }
+        public static bool IsData(this IEnumerable<byte> source) => source.Count() >= 2 && GetDataEminenceFromEncodedObject(source.ToArray());
     }
 }

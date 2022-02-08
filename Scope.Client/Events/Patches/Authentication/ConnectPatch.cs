@@ -14,7 +14,7 @@ namespace Scope.Client.Events.Patches.Authentication
     using Scope.Client.API.Features;
 
     /// <summary>
-    /// Patches <see cref="NetworkClient.Connect"/>.
+    /// Patches <see cref="NetworkClient.Connect(string)"/>.
     /// </summary>
     [HarmonyPatch(typeof(NetworkClient), nameof(NetworkClient.Connect), typeof(string))]
     internal class ConnectPatch

@@ -14,7 +14,7 @@ namespace Scope.Client.API.Features
     using Scope.Client.API.Enums;
     using Scope.Client.API.Extensions;
     using Scope.Client.Events.EventArgs;
-    using Scope.Client.Events.Patches;
+    using Scope.Client.Events.EventArgs.Data;
     using Scope.Client.Events.Patches.TransmissionNetwork;
 
     /// <summary>

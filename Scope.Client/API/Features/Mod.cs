@@ -8,10 +8,15 @@
 namespace Scope.Client.API.Features
 {
     using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
     using System.Reflection;
     using Scope.Client.API.Enums;
     using Scope.Client.API.Extensions;
     using Scope.Client.API.Interfaces;
+    using Scope.Client.Loader;
+    using UnityEngine;
 
     /// <summary>
     /// Expose the structure of the mod.
@@ -54,11 +59,37 @@ namespace Scope.Client.API.Features
         public ExecutionPriority Priority { get; }
 
         /// <inheritdoc/>
-        public Version RequiredScopeVersion { get; }
+        public Version RequiredScopeVersion { get; } = typeof(IMod<>).Assembly.GetName().Version;
+
+        /// <inheritdoc/>
+        public bool RequireServerValidation { get; }
+
+        /// <inheritdoc/>
+        public bool RequireExternalAssets { get; }
+
+        /// <inheritdoc/>
+        public List<Il2CppAssetBundle> Assets { get; }
+
+        /// <summary>
+        /// Gets the assets path.
+        /// </summary>
+        public string AssetsPath => Path.Combine(Paths.Config, Path.Combine(Name, "Assets"));
 
         /// <inheritdoc/>
         public virtual void OnEnabled()
         {
+            AssemblyInformationalVersionAttribute attribute = Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            Log.Info($"{Name} v{(attribute is null ? $"{Version.Major}.{Version.Minor}.{Version.Build}" : attribute.InformationalVersion)} by {Author} has been enabled!");
+
+            if (RequireExternalAssets)
+            {
+                foreach (string file in Directory.GetFiles(AssetsPath))
+                {
+                    Il2CppAssetBundle asset = Il2CppAssetBundleManager.LoadFromFile(file);
+                    Assets.Add(asset);
+                    BepInExLoader.AssetBundles.Add(file, asset);
+                }
+            }
         }
 
         /// <inheritdoc/>
@@ -74,12 +105,29 @@ namespace Scope.Client.API.Features
         /// <inheritdoc/>
         public virtual void OnDisabled()
         {
+            if (RequireExternalAssets)
+            {
+                foreach (Il2CppAssetBundle assetBundle in Assets)
+                    assetBundle.Unload(true);
+            }
+
+            Log.Info($"{Name} has been disabled!");
         }
 
         /// <inheritdoc/>
-        public int CompareTo(IMod<IConfig> other)
+        public virtual void OnServerEnabled()
         {
-            throw new NotImplementedException();
+            AssemblyInformationalVersionAttribute attribute = Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            Log.Info($"{Name} v{(attribute is null ? $"{Version.Major}.{Version.Minor}.{Version.Build}" : attribute.InformationalVersion)} by {Author} has been enabled!");
         }
+
+        /// <inheritdoc/>
+        public virtual void OnServerDisabled()
+        {
+            Log.Info($"{Name} has been disabled!");
+        }
+
+        /// <inheritdoc/>
+        public int CompareTo(IMod<IConfig> other) => -Priority.CompareTo(other.Priority);
     }
 }

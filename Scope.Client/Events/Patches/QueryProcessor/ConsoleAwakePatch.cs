@@ -8,6 +8,7 @@
 namespace Scope.Client.Events.Patches.QueryProcessor
 {
 #pragma warning disable SA1600 // Elements should be documented
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
     using HarmonyLib;
     using Scope.Client.API.Features;

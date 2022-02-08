@@ -8,8 +8,12 @@
 namespace Scope.Client
 {
     using System;
+    using System.IO;
+    using System.Linq;
+    using HarmonyLib;
     using Scope.Client.API.Features;
     using Scope.Client.Loader;
+    using UnhollowerRuntimeLib;
     using UnityEngine;
 
     /// <summary>

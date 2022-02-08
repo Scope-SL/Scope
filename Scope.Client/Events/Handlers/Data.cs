@@ -7,7 +7,7 @@
 
 namespace Scope.Client.Events.Handlers
 {
-    using Scope.Client.Events.EventArgs;
+    using Scope.Client.Events.EventArgs.Data;
     using Scope.Client.Events.Extensions;
     using static Scope.Client.Events.Events;
 

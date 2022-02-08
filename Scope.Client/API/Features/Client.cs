@@ -10,8 +10,10 @@ namespace Scope.Client.API.Features
     using System;
     using Mirror.LiteNetLib4Mirror;
     using RemoteAdmin;
+    using Scope.Client.API.Enums;
     using Scope.Client.API.Features.Packets;
-    using Scope.Client.Events.EventArgs;
+    using Scope.Client.Events.EventArgs.Client;
+    using Scope.Client.Events.EventArgs.Data;
     using Steamworks;
     using UnityEngine;
     using UnityEngine.SceneManagement;
@@ -222,16 +224,14 @@ namespace Scope.Client.API.Features
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            Log.Info($"Scene changed to {scene.name}");
+            if (!Enum.TryParse(scene.name, out SceneType type))
+                return;
 
-            switch (scene.name)
+            Log.Info($"Scene changed to {type}");
+
+            switch (type)
             {
-                case "Facility":
-                    {
-                        break;
-                    }
-
-                case "Loader":
+                case SceneType.Loader:
                     {
                         if (!SteamClient.IsLoggedOn)
                             break;
@@ -240,7 +240,7 @@ namespace Scope.Client.API.Features
                         break;
                     }
 
-                case "NewMainMenu":
+                case SceneType.NewMainMenu:
                     {
                         LoadedMainMenuEventArgs mainMenuEv = new();
                         Events.Handlers.Client.OnLoadedMainMenu(mainMenuEv);
@@ -279,10 +279,10 @@ namespace Scope.Client.API.Features
 
                 byte[] salt = new byte[32];
 
-                // QueryProcessor.Localplayer.Key = new UnhollowerBaseLib.Il2CppStructArray<byte>(default(IntPtr));
+                QueryProcessor.Localplayer.Key = new UnhollowerBaseLib.Il2CppStructArray<byte>(default(IntPtr));
                 QueryProcessor.Localplayer.CryptoManager.ExchangeRequested = true;
 
-                // QueryProcessor.Localplayer.CryptoManager.EncryptionKey = new UnhollowerBaseLib.Il2CppStructArray<byte>(default(IntPtr));
+                QueryProcessor.Localplayer.CryptoManager.EncryptionKey = new UnhollowerBaseLib.Il2CppStructArray<byte>(default(IntPtr));
                 QueryProcessor.Localplayer.Salt = salt;
                 QueryProcessor.Localplayer.ClientSalt = salt;
 

@@ -8,8 +8,10 @@
 namespace Scope.Client.API.Interfaces
 {
     using System;
+    using System.Collections.Generic;
     using System.Reflection;
     using Scope.Client.API.Enums;
+    using UnityEngine;
 
     /// <summary>
     /// Defines the contract for basic mod features.
@@ -51,17 +53,37 @@ namespace Scope.Client.API.Interfaces
         /// <summary>
         /// Gets the mod execution priority.
         /// </summary>
-        ExecutionPriority Priority { get; }
+        public ExecutionPriority Priority { get; }
 
         /// <summary>
         /// Gets the required version of Scope to execute the mod in stable environment.
         /// </summary>
-        Version RequiredScopeVersion { get; }
+        public Version RequiredScopeVersion { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the mod should be validated by the server.
+        /// </summary>
+        public bool RequireServerValidation { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the mod should use external assets.
+        /// </summary>
+        public bool RequireExternalAssets { get; }
+
+        /// <summary>
+        /// Gets a <see cref="List{T}"/> of <see cref="Il2CppAssetBundle"/> which contains all the assets used by the mod.
+        /// </summary>
+        public List<Il2CppAssetBundle> Assets { get; }
 
         /// <summary>
         /// Called after enabling the mod.
         /// </summary>
         public void OnEnabled();
+
+        /// <summary>
+        /// Called after disabling the mod.
+        /// </summary>
+        public void OnDisabled();
 
         /// <summary>
         /// Called every frame.
@@ -74,8 +96,13 @@ namespace Scope.Client.API.Interfaces
         public void OnGUI();
 
         /// <summary>
-        /// Called after disabling the mod.
+        /// Called after the server enables the mod, if it's needed.
         /// </summary>
-        public void OnDisabled();
+        public void OnServerEnabled();
+
+        /// <summary>
+        /// Called after the server disables the mod, if it's needed.
+        /// </summary>
+        public void OnServerDisabled();
     }
 }

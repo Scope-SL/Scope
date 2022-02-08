@@ -65,11 +65,18 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\Dev\SCOPE_INTERNAL\BepInEx\unhollowed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\Dev\SCOPE_INTERNAL\BepInEx\unhollowed\UnityEngine.UI.dll</HintPath>
+    </Reference>
     <Reference Include="YamlDotNet, Version=11.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
       <HintPath>..\packages\YamlDotNet.11.2.1\lib\net45\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Enums\SceneType.cs" />
     <Compile Include="API\Enums\ExecutionPriority.cs" />
     <Compile Include="API\Enums\TransmissionNetworkObjectType.cs" />
     <Compile Include="API\Extensions\ReflectionExtensions.cs" />
@@ -86,6 +93,7 @@
     <Compile Include="API\Features\Packets\RoundStart.cs" />
     <Compile Include="API\Features\Packets\ConnectionSuccessful.cs" />
     <Compile Include="API\Interfaces\IMod.cs" />
+    <Compile Include="AssetBundle\Il2CppAssetBundleManager.cs" />
     <Compile Include="Events\EventArgs\Client\ConnectedSuccessfullyEventArgs.cs" />
     <Compile Include="Events\EventArgs\Client\RedirectedEventArgs.cs" />
     <Compile Include="Events\EventArgs\Client\RoundStartedEventArgs.cs" />
@@ -101,8 +109,8 @@
     <Compile Include="AssetBundle\Il2CppAssetBundleCreateRequest.cs" />
     <Compile Include="AssetBundle\Il2CppAssetBundleRequest.cs" />
     <Compile Include="Events\Extensions\Event.cs" />
-    <Compile Include="Events\EventArgs\SendingDataEventArgs.cs" />
-    <Compile Include="Events\EventArgs\ReceivingDataEventArgs.cs" />
+    <Compile Include="Events\EventArgs\Data\SendingDataEventArgs.cs" />
+    <Compile Include="Events\EventArgs\Data\ReceivingDataEventArgs.cs" />
     <Compile Include="Events\Events.cs" />
     <Compile Include="Events\Patches\TransmissionNetwork\TargetPrintOnConsolePatch.cs" />
     <Compile Include="Events\Patches\TransmissionNetwork\TransmissionStartPatch.cs" />
@@ -286,9 +294,6 @@
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>$(SCOPE_INTERNAL)\BepInEx\unhollowed\Unity.TextMeshPro.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>$(SCOPE_INTERNAL)\BepInEx\unhollowed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AccessibilityModule">
       <HintPath>$(SCOPE_INTERNAL)\BepInEx\unhollowed\UnityEngine.AccessibilityModule.dll</HintPath>
@@ -476,8 +481,6 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Events\EventArgs\Server\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Scope.Client.Events.EventArgs
+namespace Scope.Client.Events.EventArgs.Client
 {
     using UnityEngine.SceneManagement;
 

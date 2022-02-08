@@ -8,6 +8,8 @@
 namespace Scope.Client.Loader
 {
     using System.IO;
+    using Scope.Client.API.Features;
+    using Scope.Client.API.Interfaces;
 
     /// <summary>
     /// A tool to easily manage and interact with paths.

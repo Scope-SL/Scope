@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Scope.Client.Events.EventArgs
+namespace Scope.Client.Events.EventArgs.Client
 {
     /// <summary>
     /// Contains all informations after the client is redirected.

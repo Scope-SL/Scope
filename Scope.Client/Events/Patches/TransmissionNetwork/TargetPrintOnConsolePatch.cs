@@ -13,6 +13,7 @@ namespace Scope.Client.Events.Patches.TransmissionNetwork
     using Scope.Client.API.Extensions;
     using Scope.Client.API.Features;
     using Scope.Client.Events.EventArgs;
+    using Scope.Client.Events.EventArgs.Data;
     using UnhollowerBaseLib;
 
     /// <summary>

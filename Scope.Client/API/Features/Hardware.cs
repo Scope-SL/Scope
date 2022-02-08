@@ -11,6 +11,7 @@ namespace Scope.Client.API.Features
     using System.IO;
     using System.Linq;
     using System.Net.NetworkInformation;
+    using UnityEngine;
 
     /// <summary>
     /// A set of tools to easily interact with client's hardware.
@@ -23,12 +24,12 @@ namespace Scope.Client.API.Features
         public string MachineName => Environment.MachineName ?? "Unknown";
 
         /// <summary>
-        /// Gets the user name of the person who's currently logged on to the Windows operating system.
+        /// Gets the username of the person who's currently logged on to the Windows operating system.
         /// </summary>
         public string UserName => Environment.UserName ?? "Unknown";
 
         /// <summary>
-        /// Gets an <see cref="OperatingSystem"/> object that contains the current platform identifier and version number.
+        /// Gets an <see cref="OperatingSystem"/> object containing the current platform identifier and version number.
         /// </summary>
         public OperatingSystem OSVersion => Environment.OSVersion;
 

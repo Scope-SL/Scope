@@ -7,10 +7,13 @@
 
 namespace Scope.Client.Loader
 {
+    using System;
     using System.Collections.Generic;
+    using System.IO;
     using BepInEx;
     using BepInEx.IL2CPP;
     using HarmonyLib;
+    using MelonLoader;
     using Scope.Client.API.Features;
     using UnhollowerRuntimeLib;
     using UnityEngine;
@@ -18,7 +21,7 @@ namespace Scope.Client.Loader
     /// <summary>
     /// Used to load the BepInEx.
     /// </summary>
-    [BepInPlugin("scopeclient.client.github", "ScopeClient", "0.0.1")]
+    [BepInPlugin("scope.client.github", "ScopeClient", "0.0.1")]
     [BepInProcess("SCPSL.exe")]
     public class BepInExLoader : BasePlugin
     {
@@ -38,6 +41,16 @@ namespace Scope.Client.Loader
         public static BepInExLoader Instance { get; private set; }
 
         /// <summary>
+        /// Gets the version.
+        /// </summary>
+        public static Version Version => new(0, 0, 1);
+
+        /// <summary>
+        /// Gets the version to display.
+        /// </summary>
+        public static string DisplayVersion => $"{Version}a";
+
+        /// <summary>
         /// Gets the <see cref="Client"></see>.
         /// </summary>
         public Client Client { get; private set; }
@@ -45,17 +58,18 @@ namespace Scope.Client.Loader
         /// <inheritdoc/>
         public override void Load()
         {
-            Instance = this;
+            UnhollowerSupport.Initialize();
 
+            Instance = this;
             Client = new Client();
 
+            CustomNetworkManager.Modded = true;
             ClassInjector.RegisterTypeInIl2Cpp<ClientComponent>();
 
             Harmony = new Harmony("scope.client.github");
             Harmony.PatchAll();
 
             Loader.LoadAll();
-
             Client.OnApplicationStart();
         }
     }

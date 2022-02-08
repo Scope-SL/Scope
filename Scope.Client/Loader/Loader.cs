@@ -82,9 +82,11 @@ namespace Scope.Client.Loader
         /// <param name="deps">The dependencies loaded by Scope.</param>
         public static void LoadAll(Assembly[] deps = null)
         {
-            var assemblyName = Assembly.GetExecutingAssembly().GetName();
+            AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
+
             Log.Message($"{assemblyName.Name} - " +
                 $"Version {assemblyName.Version}");
+
             CustomNetworkManager.Modded = true;
             Paths.Init();
 
@@ -100,7 +102,7 @@ namespace Scope.Client.Loader
         public static void GlobalStartupProcess()
         {
             LoadDependencies();
-            LoadConfigDepen();
+            LoadConfigDeps();
             LoadMods();
             EnableMods();
         }
@@ -108,7 +110,7 @@ namespace Scope.Client.Loader
         /// <summary>
         ///  Sets the value of <see cref="Deserializer"/> and <see cref="Serializer"/>.
         /// </summary>
-        public static void LoadConfigDepen()
+        public static void LoadConfigDeps()
         {
             Deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
                 .WithNamingConvention(YamlDotNet.Serialization.NamingConventions.UnderscoredNamingConvention.Instance)
@@ -143,6 +145,7 @@ namespace Scope.Client.Loader
                 if (constructor is null)
                 {
                     object value = Array.Find(type.GetProperties(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public), property => property.PropertyType == type)?.GetValue(null);
+
                     if (value != null)
                         mod = value as IMod<IConfig>;
                 }
@@ -151,6 +154,12 @@ namespace Scope.Client.Loader
 
                 if (CheckModVersion(mod))
                     continue;
+
+                if (mod.RequireExternalAssets)
+                {
+                    Directory.CreateDirectory(Path.Combine(Paths.Config, mod.Name));
+                    Directory.CreateDirectory(Path.Combine(Paths.Config, Path.Combine(mod.Name, "Assets")));
+                }
 
                 mod?.OnEnabled();
                 Mods.Add(mod);
@@ -168,7 +177,7 @@ namespace Scope.Client.Loader
             {
                 try
                 {
-                    if (!mod.Name.StartsWith("Scope") || !mod.Config.IsEnabled)
+                    if (!mod.Name.StartsWith("Scope") || !mod.Config.IsEnabled || !mod.RequireServerValidation)
                         continue;
 
                     mod.OnEnabled();
@@ -177,19 +186,6 @@ namespace Scope.Client.Loader
                 catch (Exception e)
                 {
                     Log.Error($"Mod \"{mod.Name}\" threw an exception while enabling: {e}");
-                }
-            }
-
-            foreach (IMod<IConfig> mod in toLoad)
-            {
-                try
-                {
-                    if (mod.Config.IsEnabled)
-                        mod.OnEnabled();
-                }
-                catch (Exception exception)
-                {
-                    Log.Error($"Mod \"{mod.Name}\" threw an exception while enabling: {exception}");
                 }
             }
         }
@@ -207,7 +203,7 @@ namespace Scope.Client.Loader
                 {
                     Assembly assembly = LoadAssemblyFromPath(dependency);
 
-                    if (assembly == null)
+                    if (assembly is null)
                         continue;
 
                     Locations[assembly] = dependency;

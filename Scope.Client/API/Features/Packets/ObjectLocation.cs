@@ -31,7 +31,7 @@ namespace Scope.Client.API.Features.Packets
         /// <returns>The encoded <see cref="TransmissionNetworkObject"/>.</returns>
         public static TransmissionNetworkObject Encode(Vector3 position, Quaternion rotation, string value)
         {
-            byte[] bytes = new byte[(4 * 3) + (4 * 4) + 4 + (4 + value.Length)];
+            byte[] bytes = new byte[(4 * 3) + (4 * 4) + 4 + 4 + value.Length];
             byte[] xb = BitConverter.GetBytes(position.x);
             byte[] yb = BitConverter.GetBytes(position.y);
             byte[] zb = BitConverter.GetBytes(position.z);

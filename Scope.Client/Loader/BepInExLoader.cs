@@ -64,7 +64,6 @@ namespace Scope.Client.Loader
             Client = new Client();
 
             CustomNetworkManager.Modded = true;
-            ClassInjector.RegisterTypeInIl2Cpp<ClientComponent>();
 
             Harmony = new Harmony("scope.client.github");
             Harmony.PatchAll();

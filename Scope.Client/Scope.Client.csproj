@@ -102,7 +102,6 @@
     <Compile Include="Events\EventArgs\Client\LoadedMainMenuEventArgs.cs" />
     <Compile Include="Events\EventArgs\Client\LoadingMainMenuEventArgs.cs" />
     <Compile Include="Events\Handlers\Client.cs" />
-    <Compile Include="Loader\Config.cs" />
     <Compile Include="API\Features\Log.cs" />
     <Compile Include="API\Features\TransmissionNetworkObject.cs" />
     <Compile Include="AssetBundle\Il2CppAssetBundle.cs" />
@@ -124,6 +123,7 @@
     <Compile Include="Events\Patches\MainMenu\NewsPatch.cs" />
     <Compile Include="Events\Handlers\Data.cs" />
     <Compile Include="Loader\BepInExLoader.cs" />
+    <Compile Include="Loader\Config.cs" />
     <Compile Include="Loader\Features\ConfigManager.cs" />
     <Compile Include="Loader\Features\Configs\CommentsObjectGraphVisitor.cs" />
     <Compile Include="Loader\Features\Configs\ConfigsValidator.cs" />

@@ -7,7 +7,6 @@ namespace Scope.Launcher
     {
         public static void Main(string[] args)
         {
-
             [DllImport("UnityPlayer.dll", CharSet = CharSet.Unicode)]
             static extern IntPtr UnityMain(IntPtr instance, IntPtr previous_instance, string[] command_line, int show_command_line);
 

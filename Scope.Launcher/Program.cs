@@ -1,5 +1,5 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="Installer.cs" company="Scope SL">
+// <copyright file="Program.cs" company="Scope SL">
 // Copyright (c) Scope SL. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>

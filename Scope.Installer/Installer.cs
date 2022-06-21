@@ -5,17 +5,14 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System.IO;
-using System.Linq;
-using ICSharpCode.SharpZipLib.Zip;
 
 namespace Scope.Installer
 {
     using System;
+    using System.IO;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using ICSharpCode.SharpZipLib.GZip;
-    using ICSharpCode.SharpZipLib.Tar;
+    using ICSharpCode.SharpZipLib.Zip;
 
     /// <summary>
     /// The installer tool.

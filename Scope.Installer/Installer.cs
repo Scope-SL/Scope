@@ -5,6 +5,10 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System.IO;
+using System.Linq;
+using ICSharpCode.SharpZipLib.Zip;
+
 namespace Scope.Installer
 {
     using System;
@@ -21,7 +25,14 @@ namespace Scope.Installer
         /// <summary>
         /// The URL to download the Scope files from.
         /// </summary>
-        private const string DownloadUrl = "FILL ME";
+        private const string DownloadUrl = "https://scopesl.com/ScopeStuff.zip";
+
+        // TODO: Autodetect game path.
+
+        /// <summary>
+        /// The game folder path.
+        /// </summary>
+        private const string GameFolder = @"C:\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory";
 
         /// <summary>
         /// This method is the entrypoint of the program.
@@ -32,6 +43,44 @@ namespace Scope.Installer
             try
             {
                 var download = await Download(DownloadUrl);
+                if (!download.CanDecompressEntry)
+                {
+                    Console.WriteLine("Something went wrong downloading!");
+                    Console.Read();
+                    Environment.Exit(0);
+                }
+
+                ZipEntry zipEntry;
+                while ((zipEntry = download.GetNextEntry()) is not null)
+                {
+                    string name = Path.Combine(GameFolder, ZipEntry.CleanName(zipEntry.Name) ?? zipEntry.Name);
+                    if (zipEntry.IsDirectory)
+                    {
+                        Directory.CreateDirectory(name);
+                    }
+                    else if (!string.IsNullOrEmpty(name))
+                    {
+                        if (File.Exists(name) && ConfirmOverwrite(name))
+                            continue;
+                        using (FileStream streamWriter = File.Create(name))
+                        {
+                            int size = 2048;
+                            byte[] data = new byte[2048];
+                            while (true)
+                            {
+                                size = download.Read(data, 0, data.Length);
+                                if (size > 0)
+                                {
+                                    streamWriter.Write(data, 0, size);
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -41,9 +90,26 @@ namespace Scope.Installer
             }
         }
 
-        private static async Task<TarInputStream> Download(string url)
+        /// <summary>
+        /// Confirms overwriting of existing files.
+        /// </summary>
+        /// <param name="filename">The path of the file.</param>
+        /// <returns>Whether or not to overwrite.</returns>
+        private static bool ConfirmOverwrite(string filename)
         {
-            HttpResponseMessage responseMessage = new HttpResponseMessage();
+            File.Move(filename, filename + ".vanilla");
+            return true;
+        }
+
+        /// <summary>
+        /// Downloads a zip from the giving URL.
+        /// </summary>
+        /// <param name="url">The URL to download from.</param>
+        /// <returns>The downloaded file.</returns>
+        private static async Task<ZipInputStream> Download(string url)
+        {
+            HttpResponseMessage message = new HttpResponseMessage();
+
             HttpClient client = new HttpClient()
             {
                 Timeout = TimeSpan.FromSeconds(480),
@@ -52,7 +118,7 @@ namespace Scope.Installer
             try
             {
                 using var download = await client.GetAsync(DownloadUrl).ConfigureAwait(false);
-                responseMessage = download;
+                message = download;
             }
             catch (Exception ex)
             {
@@ -61,13 +127,12 @@ namespace Scope.Installer
                     throw;
                 }
 
-                Console.WriteLine("Check your internet connect and Scope server status and try again");
+                Console.WriteLine("Check your internet connection and Scope server status and try again");
             }
 
-            using var downloadArchive = await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            using var gzInputStream = new GZipInputStream(downloadArchive);
-            using var tarInputStream = new TarInputStream(gzInputStream, null);
-            return tarInputStream;
+            await using var downloadArchive = await message.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            await using var zipInputStream = new ZipInputStream(downloadArchive);
+            return zipInputStream;
         }
     }
 }

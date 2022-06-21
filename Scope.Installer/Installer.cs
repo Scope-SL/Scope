@@ -19,7 +19,7 @@ namespace Scope.Installer
     public class Installer
     {
         /// <summary>
-        /// The URL to download the Scope files from
+        /// The URL to download the Scope files from.
         /// </summary>
         private const string DownloadUrl = "FILL ME";
 
@@ -57,7 +57,10 @@ namespace Scope.Installer
             catch (Exception ex)
             {
                 if (!(ex is TaskCanceledException || ex is HttpRequestException))
+                {
                     throw;
+                }
+
                 Console.WriteLine("Check your internet connect and Scope server status and try again");
             }
 

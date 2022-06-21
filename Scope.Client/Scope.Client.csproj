@@ -132,7 +132,6 @@
     <Compile Include="Loader\Features\Configs\CommentGatheringTypeInspector.cs" />
     <Compile Include="Loader\Features\ExecutionPriorityComparer.cs" />
     <Compile Include="Loader\Loader.cs" />
-    <Compile Include="Loader\Patches\AntiCheatPatch.cs" />
     <Compile Include="Loader\Paths.cs" />
     <Compile Include="API\Features\Client.cs" />
     <Compile Include="ClientComponent.cs" />

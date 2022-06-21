@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Scope.Client.Events.Patches.QueryProcessor
+namespace Scope.Client.Events.Patches.MainMenu
 {
 #pragma warning disable SA1600 // Elements should be documented
 #pragma warning disable SA1118 // Parameter should not span multiple lines

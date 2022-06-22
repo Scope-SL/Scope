@@ -5,14 +5,15 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System.Linq;
 
 namespace Scope.Installer
 {
     using System;
     using System.IO;
+    using System.IO.Compression;
     using System.Net.Http;
     using System.Threading.Tasks;
-    using ICSharpCode.SharpZipLib.Zip;
 
     /// <summary>
     /// The installer tool.
@@ -40,43 +41,35 @@ namespace Scope.Installer
             try
             {
                 var download = await Download(DownloadUrl);
-                if (!download.CanDecompressEntry)
+                var archive = new ZipArchive(download);
+                if (archive.Entries.All(x => !x.FullName.StartsWith("ScopeStuff")))
                 {
-                    Console.WriteLine("Something went wrong downloading!");
+                    Console.WriteLine("Unable to find archive contents, is the installer outdated?");
                     Console.Read();
                     Environment.Exit(0);
                 }
 
-                ZipEntry zipEntry;
-                while ((zipEntry = download.GetNextEntry()) is not null)
+                archive.ExtractToDirectory(GameFolder, true);
+                if (!Directory.Exists(Path.Combine(GameFolder, "ScopeStuff")))
                 {
-                    string name = Path.Combine(GameFolder, ZipEntry.CleanName(zipEntry.Name) ?? zipEntry.Name);
-                    if (zipEntry.IsDirectory)
+                    return;
+                }
+
+                foreach (var file in Directory.GetFiles(Path.Combine(GameFolder, "ScopeStuff")))
+                {
+                    var originalPath = Path.Combine(GameFolder, file
+                        .Substring(file.Length - file
+                            .ToCharArray()
+                            .Reverse()
+                            .ToList()
+                            .IndexOf(Path.DirectorySeparatorChar)));
+
+                    if (File.Exists(originalPath))
                     {
-                        Directory.CreateDirectory(name);
+                        File.Move(originalPath, $"{originalPath}.old", true);
                     }
-                    else if (!string.IsNullOrEmpty(name))
-                    {
-                        if (File.Exists(name) && ConfirmOverwrite(name))
-                            continue;
-                        using (FileStream streamWriter = File.Create(name))
-                        {
-                            int size = 2048;
-                            byte[] data = new byte[2048];
-                            while (true)
-                            {
-                                size = download.Read(data, 0, data.Length);
-                                if (size > 0)
-                                {
-                                    streamWriter.Write(data, 0, size);
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                    }
+
+                    File.Move(file, originalPath, true);
                 }
             }
             catch (Exception ex)
@@ -88,24 +81,13 @@ namespace Scope.Installer
         }
 
         /// <summary>
-        /// Confirms overwriting of existing files.
-        /// </summary>
-        /// <param name="filename">The path of the file.</param>
-        /// <returns>Whether or not to overwrite.</returns>
-        private static bool ConfirmOverwrite(string filename)
-        {
-            File.Move(filename, filename + ".vanilla");
-            return true;
-        }
-
-        /// <summary>
         /// Downloads a zip from the giving URL.
         /// </summary>
         /// <param name="url">The URL to download from.</param>
         /// <returns>The downloaded file.</returns>
-        private static async Task<ZipInputStream> Download(string url)
+        private static async Task<Stream> Download(string url)
         {
-            HttpResponseMessage message = new HttpResponseMessage();
+            Stream stream = Stream.Null;
 
             HttpClient client = new HttpClient()
             {
@@ -114,8 +96,8 @@ namespace Scope.Installer
 
             try
             {
-                using var download = await client.GetAsync(DownloadUrl).ConfigureAwait(false);
-                message = download;
+                var download = await client.GetAsync(DownloadUrl).ConfigureAwait(false);
+                stream = await download.Content.ReadAsStreamAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -125,11 +107,11 @@ namespace Scope.Installer
                 }
 
                 Console.WriteLine("Check your internet connection and Scope server status and try again");
+                Console.Read();
+                Environment.Exit(0);
             }
 
-            await using var downloadArchive = await message.Content.ReadAsStreamAsync().ConfigureAwait(false);
-            await using var zipInputStream = new ZipInputStream(downloadArchive);
-            return zipInputStream;
+            return stream;
         }
     }
 }

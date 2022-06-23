@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Scope.Client.API.Features
+namespace Scope.Client.Loader
 {
     using System.ComponentModel;
     using Scope.Client.API.Interfaces;

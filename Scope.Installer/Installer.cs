@@ -28,7 +28,7 @@ namespace Scope.Installer
         /// The URL to download the Scope files from.
         /// </summary>
         private const string DownloadUrl = "https://scopesl.com/ScopeStuff.zip";
-        
+
         /// <summary>
         /// The download hash.
         /// </summary>

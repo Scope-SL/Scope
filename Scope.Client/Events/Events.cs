@@ -9,6 +9,7 @@ namespace Scope.Client.Events
 {
     using System;
     using Scope.Client.API.Features;
+    using Scope.Client.Loader;
 
     /// <summary>
     /// A tool to easily handle events.

@@ -12,8 +12,8 @@ namespace Scope.Installer
     using System.IO;
     using System.IO.Compression;
     using System.Linq;
-    using System.Net;
     using System.Net.Http;
+    using System.Reflection;
     using System.Security.Cryptography;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
@@ -34,6 +34,9 @@ namespace Scope.Installer
         /// </summary>
         private const string ZipHash = "DD567472AFF7FCF14916EF3AF4E80EA58BB02AF8200EEF9BED639307AF5A2D67";
 
+        /// <summary>
+        /// Files that are renamed instead of overwritten.
+        /// </summary>
         private static readonly List<string> DoNotOverwrite = new()
         {
             "SCPSL.exe",
@@ -45,18 +48,23 @@ namespace Scope.Installer
         /// <param name="args"><see cref="string"/>[] args.</param>
         public static async Task Main(string[] args)
         {
-            string GameFolder = GetSLFolder();
+            Console.WriteLine($"Scope.Installer {Assembly.GetExecutingAssembly().GetName().Version}");
+            Console.WriteLine("Finding SL installation...");
+            string gameFolder = await GetSLFolder();
+            if (!Directory.Exists(gameFolder) || Directory.GetFiles(gameFolder).Contains("SCPSL.exe"))
+            {
+                Console.WriteLine("Could not find the game folder, aborting.");
+                Console.Read();
+                Environment.Exit(0);
+            }
 
             try
             {
+                Console.WriteLine("Downloading files...");
                 var download = await Download(DownloadUrl);
                 var sha256 = SHA256.Create();
+                Console.WriteLine("Checking hash...");
                 var hash = BitConverter.ToString(sha256.ComputeHash(download)).Replace("-", string.Empty);
-
-                using (WebClient wc = new WebClient())
-                {
-                    wc.DownloadFile("https://github.com/moddedmcplayer/scope-files/raw/main/ScopeStuff.zip", "ScopeStuff.zip");
-                }
 
                 if (hash != ZipHash)
                 {
@@ -65,6 +73,7 @@ namespace Scope.Installer
                     Environment.Exit(0);
                 }
 
+                Console.WriteLine("Extracting files...");
                 var archive = new ZipArchive(download);
                 if (archive.Entries.All(x => !x.FullName.StartsWith("ScopeStuff")))
                 {
@@ -73,19 +82,20 @@ namespace Scope.Installer
                     Environment.Exit(0);
                 }
 
-                archive.ExtractToDirectory(GameFolder, true);
-                if (!Directory.Exists(Path.Combine(GameFolder, "ScopeStuff")))
+                Console.WriteLine("Moving files...");
+                archive.ExtractToDirectory(gameFolder, true);
+                if (!Directory.Exists(Path.Combine(gameFolder, "ScopeStuff")))
                 {
                     return;
                 }
 
-                var AC = Path.Combine(GameFolder, "SL-AC.dll");
+                var AC = Path.Combine(gameFolder, "SL-AC.dll");
                 if (File.Exists(AC))
                 {
                     File.Move(AC, $"{AC}.disabled");
                 }
 
-                foreach (var file in Directory.GetFiles(Path.Combine(GameFolder, "ScopeStuff")))
+                foreach (var file in Directory.GetFiles(Path.Combine(gameFolder, "ScopeStuff")))
                 {
                     var fileName = file
                         .Substring(file.Length - file
@@ -93,7 +103,7 @@ namespace Scope.Installer
                             .Reverse()
                             .ToList()
                             .IndexOf(Path.DirectorySeparatorChar));
-                    var originalPath = Path.Combine(GameFolder, fileName);
+                    var originalPath = Path.Combine(gameFolder, fileName);
 
                     if (File.Exists(originalPath) && DoNotOverwrite.Contains(fileName))
                     {
@@ -106,10 +116,24 @@ namespace Scope.Installer
                     File.Move(file, originalPath, true);
                 }
 
-                foreach (var dir in Directory.GetDirectories(Path.Combine(GameFolder, "ScopeStuff")))
+                foreach (var dir in Directory.GetDirectories(Path.Combine(gameFolder, "ScopeStuff")))
                 {
-                    Directory.Move(dir, dir.Replace("ScopeStuff\\", string.Empty));
+                    var newDir = dir.Replace("ScopeStuff\\", string.Empty);
+                    if (Directory.Exists(newDir))
+                    {
+                        Directory.Delete(newDir, true);
+                    }
+
+                    Directory.Move(dir, newDir);
                 }
+
+                Console.WriteLine("Cleaning up...");
+                if (Directory.Exists(Path.Combine(gameFolder, "ScopeStuff")))
+                {
+                    Directory.Delete(Path.Combine(gameFolder, "ScopeStuff"));
+                }
+
+                Console.WriteLine("Done!");
             }
             catch (Exception ex)
             {
@@ -158,8 +182,9 @@ namespace Scope.Installer
         private const string DefaultSLPath = @"C:\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory";
         private const string SLFolderName = @"SCP Secret Laboratory";
 
-        private static string GetSLFolder()
+        private static async Task<string> GetSLFolder()
         {
+            bool usingDefault = true;
             string steamPath;
             RegistryKey softwareKey = null;
             try
@@ -173,6 +198,7 @@ namespace Scope.Installer
                     var installPath = obj as string;
                     bool foundSteam = (!string.IsNullOrWhiteSpace(installPath) && Directory.Exists(installPath));
 
+                    Console.WriteLine(foundSteam ? $"Found Steam at: {installPath}" : $"Could not find Steam, using default path: {DefaultSteamPath}");
                     steamPath = foundSteam ? installPath : DefaultSteamPath;
                 }
             }
@@ -190,7 +216,7 @@ namespace Scope.Installer
             var libraryPaths = new List<string>();
 
             var vdfFile = new FileInfo(Path.Combine(steamPath, @"steamapps\libraryfolders.vdf"));
-            if (!vdfFile.Exists)
+            if (vdfFile.Exists)
             {
                 string content;
                 using (var stream = vdfFile.OpenRead())
@@ -201,21 +227,49 @@ namespace Scope.Installer
                     }
                 }
 
-                var matches = Regex.Matches(content, "\"\\d\"\\s+\"(?<path>.+)\"");
-                foreach (Match match in matches)
+                string[] lines = content.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                string pattern = @"path";
+                foreach (string line in lines)
                 {
-                    string path = match.Groups["path"].Value;
-                    path = path.Replace(@"\\", @"\");
+                    if (!Regex.IsMatch(line, pattern))
+                    {
+                        continue;
+                    }
+
+                    var path = line
+                        .Replace(@"\\", @"\")
+                        .Replace("path", string.Empty)
+                        .Replace("\"", string.Empty);
+
+                    path = path.Substring(path.ToCharArray().ToList()
+                        .FindIndex(x => !string.IsNullOrWhiteSpace(x.ToString())));
                     libraryPaths.Add(path);
                 }
 
                 foreach (var path in libraryPaths)
                 {
-                    if (Directory.Exists(path) && Directory.GetDirectories(path).Contains(SLFolderName))
+                    var gamePath = Path.Combine(path, "steamapps", "common");
+                    if (Directory.Exists(gamePath) && Directory.GetDirectories(gamePath).Any(x => x.EndsWith(SLFolderName)))
                     {
-                        SLPath = path;
+                        SLPath = Path.Combine(gamePath, SLFolderName);
+                        usingDefault = false;
+                        Console.WriteLine($"Found SL install path: {SLPath}");
+                        break;
+                    }
+
+                    if (Directory.Exists(path) && Directory.GetDirectories(path).Any(x => x.EndsWith(SLFolderName)))
+                    {
+                        SLPath = Path.Combine(path, SLFolderName);
+                        usingDefault = false;
+                        Console.WriteLine($"Found SL install path: {SLPath}");
+                        break;
                     }
                 }
+            }
+
+            if (usingDefault)
+            {
+                Console.WriteLine($"Unable to auto-detect SL path, using default path: {DefaultSLPath}");
             }
 
             return SLPath;

@@ -279,12 +279,13 @@ namespace Scope.Client.API.Features
 
                 byte[] salt = new byte[32];
 
-                QueryProcessor.Localplayer.Key = new UnhollowerBaseLib.Il2CppStructArray<byte>(default(IntPtr));
-                QueryProcessor.Localplayer.CryptoManager.ExchangeRequested = true;
+                QueryProcessor queryProcessor = ReferenceHub.LocalHub.queryProcessor;
+                queryProcessor.Key = new UnhollowerBaseLib.Il2CppStructArray<byte>(default(IntPtr));
+                queryProcessor.CryptoManager.ExchangeRequested = true;
 
-                QueryProcessor.Localplayer.CryptoManager.EncryptionKey = new UnhollowerBaseLib.Il2CppStructArray<byte>(default(IntPtr));
-                QueryProcessor.Localplayer.Salt = salt;
-                QueryProcessor.Localplayer.ClientSalt = salt;
+                queryProcessor.CryptoManager.EncryptionKey = new UnhollowerBaseLib.Il2CppStructArray<byte>(default(IntPtr));
+                queryProcessor.Salt = salt;
+                queryProcessor.ClientSalt = salt;
 
                 TransmissionNetworkObject.SendData(TransmissionNetworkObject.GetSource(1, "Client connected successfully"));
                 return;

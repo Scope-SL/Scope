@@ -24,6 +24,7 @@ namespace Scope.Installer
     /// </summary>
     public class Installer
     {
+        // TODO
         /// <summary>
         /// The URL to download the Scope files from.
         /// </summary>

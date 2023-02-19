@@ -8,7 +8,7 @@
     public class PatchCollection : List<Patch>
     {
         public string AssemblyName { get; internal set; }
-        public bool CanPatch => AssemblyName is not null && Count > 0;
+        public bool CanPatch => this.AssemblyName is not null && this.Count > 0;
 
         public PatchCollection()
         {
@@ -16,13 +16,13 @@
 
         public PatchCollection(string assemblyName, IEnumerable<Patch> patches)
         {
-            if(patches == null)
+            if (patches == null)
             {
                 throw new ArgumentNullException(nameof(patches));
             }
             
-            AddRange(patches);
-            AssemblyName = assemblyName;
+            this.AddRange(patches);
+            this.AssemblyName = assemblyName;
         }
     }
 }

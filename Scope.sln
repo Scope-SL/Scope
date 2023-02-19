@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scope.Launcher", "Scope.Launcher\Scope.Launcher.csproj", "{C162996D-0CA0-482A-A76D-EC53B3F11BFE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scope.Patcher", "Scope.Patcher\Scope.Patcher.csproj", "{DB836450-BD75-433D-BAF6-82695ED8E0C6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{C162996D-0CA0-482A-A76D-EC53B3F11BFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C162996D-0CA0-482A-A76D-EC53B3F11BFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C162996D-0CA0-482A-A76D-EC53B3F11BFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB836450-BD75-433D-BAF6-82695ED8E0C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB836450-BD75-433D-BAF6-82695ED8E0C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB836450-BD75-433D-BAF6-82695ED8E0C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB836450-BD75-433D-BAF6-82695ED8E0C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

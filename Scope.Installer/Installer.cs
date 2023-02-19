@@ -24,6 +24,7 @@ namespace Scope.Installer
     /// </summary>
     public class Installer
     {
+        // TODO
         /// <summary>
         /// The URL to download the Scope files from.
         /// </summary>
@@ -53,9 +54,7 @@ namespace Scope.Installer
             string gameFolder = await GetSLFolder();
             if (!Directory.Exists(gameFolder) || Directory.GetFiles(gameFolder).Contains("SCPSL.exe"))
             {
-                Console.WriteLine("Could not find the game folder, aborting.");
-                Console.Read();
-                Environment.Exit(0);
+                Error("Could not find the game folder, aborting.");
             }
 
             try
@@ -68,18 +67,14 @@ namespace Scope.Installer
 
                 if (hash != ZipHash)
                 {
-                    Console.WriteLine("The archive hash does not match!");
-                    Console.Read();
-                    Environment.Exit(0);
+                    Error("The archive hash does not match!");
                 }
 
                 Console.WriteLine("Extracting files...");
                 var archive = new ZipArchive(download);
                 if (archive.Entries.All(x => !x.FullName.StartsWith("ScopeStuff")))
                 {
-                    Console.WriteLine("Unable to find archive contents, is the installer outdated?");
-                    Console.Read();
-                    Environment.Exit(0);
+                    Error("Unable to find archive contents, is the installer outdated?");
                 }
 
                 Console.WriteLine("Moving files...");
@@ -137,9 +132,7 @@ namespace Scope.Installer
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-                Console.Read();
-                Environment.Exit(0);
+                Error(ex.ToString());
             }
         }
 
@@ -170,9 +163,7 @@ namespace Scope.Installer
                     throw;
                 }
 
-                Console.WriteLine("Check your internet connection and Scope server status and try again");
-                Console.Read();
-                Environment.Exit(0);
+                Error("Check your internet connection and Scope server status and try again");
             }
 
             return stream;
@@ -273,6 +264,15 @@ namespace Scope.Installer
             }
 
             return SLPath;
+        }
+        
+        public static void Error(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(message);
+            Console.ResetColor();
+            Console.Read();
+            Environment.Exit(0);
         }
     }
 }
